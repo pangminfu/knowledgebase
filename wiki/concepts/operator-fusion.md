@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [career]
-sources: [2026-11-10-deep-learning-brrrr-first-principles]
+sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-10
-updated: 2026-11-10
+updated: 2026-11-12
 ---
 
 # Operator fusion
@@ -24,6 +24,13 @@ Fused: one read, all three transforms on-chip, one write. (src: [[2026-11-10-dee
 - Tools: NVFuser and XLA do simple fusions automatically. Triton is suggested for writing custom fused kernels. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - Consequences: fused `x.cos().cos()` ≈ cost of `x.cos()`, which is why `gelu` costs about the same as `relu`. Recomputing values instead of storing them (rematerialization / activation checkpointing) can reduce *both* memory and runtime. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - Helps both bandwidth-bound and overhead-bound workloads, since fewer kernels also means fewer launches. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
+
+## How much it costs when missing
+
+- In a 336M-parameter transformer, memory-bound intermediate ops (softmax, layernorm, biases, ReLU, dropout) are **43% of total latency**, while contributing a fraction of a percent of flops. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Scaled softmax took 453 µs against 0.2 GFLOP, while q/k/v projection took 333 µs for 25.8 GFLOP — the memory-bound signature. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Counting memory passes is a diagnosis: softmax needs 1 read + 1 write in theory but commonly does 4 passes, and `q·k` 2 reads + 1 write, so the measured time reveals the missing fusion. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- The damage shrinks with model width: per-layer traffic grows ~`d_model` while flops grow ~`d_model²`, so at 52B parameters unfused intermediates are ~5% of latency. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ## Why it matters for a GPU cloud
 

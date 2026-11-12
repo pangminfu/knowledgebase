@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [career, metering-billing]
-sources: [2026-11-10-deep-learning-brrrr-first-principles]
+sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-10
-updated: 2026-11-10
+updated: 2026-11-12
 ---
 
 # GPU performance regimes
@@ -29,6 +29,13 @@ A factory twice the size, still fed by the same conveyor belts. Output can't dou
 
 - Large models usually mix compute-bound and memory-bound parts, so the regime is a matter of degree. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - Caveat: a bigger batch can also raise *compute intensity* (math per byte), e.g. a [B, D]×[D, D] matmul with B < D. So the batch-size test isn't purely about overhead. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
+
+## Inference is memory-bound by default
+
+Generation has no batch to hide behind: each new token requires reading every weight, and the "[batch]" is how many tokens are in flight. A current model of this says the crossover is the hardware's flops-per-byte ratio (312e12 ÷ 1.5e12 = 208 for an A100), so a single-request decode is bandwidth-bound and stays so until hundreds of tokens are batched together. (src: [[2026-11-12-transformer-inference-arithmetic]]) See [[inference-batching]] and [[inference-latency-model]].
+
+- Regimes are therefore a property of the *load*, not just of the model: the same model is memory-bound at batch 1 and flops-bound at batch 512. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- The overhead regime is largely absent from these models — real stack overhead lands as a 10–35% gap between predicted and measured latency. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ## Why it matters for a GPU cloud
 

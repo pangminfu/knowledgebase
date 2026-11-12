@@ -24,3 +24,10 @@ Append-only. Entry format: `## [YYYY-MM-DD] <ingest|query|lint|schema|init> | <t
 - Created: wiki/concepts/gpu-performance-regimes.md, flops.md, memory-bandwidth.md, operator-fusion.md, framework-overhead.md, gpu-utilization-metrics.md
 - Created: wiki/entities/nvidia-a100.md, nvidia-smi.md
 - Updated: wiki/overview.md, wiki/index.md
+
+## [2026-11-12] ingest | Transformer Inference Arithmetic
+- Saved source to `raw/2026-11-12-transformer-inference-arithmetic.md` (full text, 14 display equations) and 5 images as `raw/assets/tia-*.png`
+- Created `wiki/sources/2026-11-12-transformer-inference-arithmetic.md`
+- Created concepts: `kv-cache`, `gpu-memory-capacity`, `inference-batching`, `model-parallelism`, `inference-latency-model`
+- Created synthesis: `2026-11-12-sizing-a-gpu-inference-deployment`
+- Updated `overview`, `index`, `gpu-performance-regimes`, `flops`, `memory-bandwidth`, `operator-fusion`, `gpu-utilization-metrics`, `nvidia-a100`

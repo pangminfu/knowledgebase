@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [provisioning, career]
-sources: [2026-11-10-deep-learning-brrrr-first-principles]
+sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-10
-updated: 2026-11-10
+updated: 2026-11-12
 ---
 
 # Memory bandwidth
@@ -29,6 +29,12 @@ Microbenchmark: repeat `x * 2` N times in one fused kernel. Runtime stays flat u
 
 - Compute has historically grown faster than bandwidth, so memory-bound behaviour gets more common with each hardware generation. See [[flops]]. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - Main fix: [[operator-fusion]]. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
+
+## The per-SKU ratio
+
+- Compressing the above into one number: peak flops ÷ bandwidth. For an A100, 312e12 ÷ 1.5e12 = **208 flops per byte**. Workloads below that arithmetic intensity are memory-bound; above, compute-bound. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- It is the fastest way to compare SKUs for inference: a card with double the flops but the same bandwidth does not help a memory-bound workload. (general knowledge; arithmetic from the source)
+- For LLM inference the ratio becomes a token count: below ~208 tokens in flight, reading the weights dominates. See [[inference-batching]]. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ## Why it matters for a GPU cloud
 

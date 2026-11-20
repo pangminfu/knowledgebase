@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [provisioning, tenancy-quotas, metering-billing, career]
-sources: [2026-11-12-transformer-inference-arithmetic]
+sources: [2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference]
 created: 2026-11-12
-updated: 2026-11-12
+updated: 2026-11-21
 ---
 
 # Inference batching
@@ -49,7 +49,8 @@ Left to right: small batch means memory is mostly weights, the bottleneck is ban
 
 - **Metering and billing:** cost per token falls with batch size, so a provider selling "tokens" is really selling *batching efficiency*; GPU-hours and tokens-per-second are different products. (general knowledge; the arithmetic is src)
 - **Tenancy and quotas:** concurrency limits are batch-size limits. A tenant allowed "one replica" gets whatever concurrency memory permits, not a fixed request count. (general knowledge)
-- **Scheduling:** real serving mixes requests with different context lengths, which static batching cannot pack efficiently — the reason continuous/in-flight batching and paged caches exist. (general knowledge; the post's model assumes a uniform batch)
+- **Scheduling:** real serving mixes requests with different context lengths, which static batching cannot pack efficiently. That is why continuous/in-flight batching and paged caches exist. (general knowledge; the post's model assumes a uniform batch)
+- **Where it runs:** batching across concurrent requests is a built-in feature of [[inference-frameworks]] and one of the core [[inference-serving]] responsibilities. The handbook lists continuous batching ("dynamically grouping requests for better GPU utilization") first among optimizations. Roadmap: [[inference-optimization]]. (src: [[2026-11-21-what-is-llm-inference]])
 - **SLA design:** latency and throughput are the same knob at different settings, so an SLA needs to say which one is guaranteed. (src + general knowledge)
 
 ## Open questions
@@ -65,3 +66,5 @@ Left to right: small batch means memory is mostly weights, the bottleneck is ban
 - [[model-parallelism]]: trading GPUs for latency at fixed batch.
 - [[gpu-performance-regimes]]: the bound you are in at each batch size.
 - [[2026-11-12-sizing-a-gpu-inference-deployment]]: batch size as the cost lever in a full deployment sizing.
+- [[inference-optimization]]: continuous batching and the other techniques that raise tokens per GPU.
+- [[per-token-pricing]]: batch efficiency is the margin in per-token prices.

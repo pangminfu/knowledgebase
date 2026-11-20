@@ -31,3 +31,9 @@ Append-only. Entry format: `## [YYYY-MM-DD] <ingest|query|lint|schema|init> | <t
 - Created concepts: `kv-cache`, `gpu-memory-capacity`, `inference-batching`, `model-parallelism`, `inference-latency-model`
 - Created synthesis: `2026-11-12-sizing-a-gpu-inference-deployment`
 - Updated `overview`, `index`, `gpu-performance-regimes`, `flops`, `memory-bandwidth`, `operator-fusion`, `gpu-utilization-metrics`, `nvidia-a100`
+
+## [2026-11-21] ingest | What is LLM inference? (Modular LLM Inference Handbook)
+- Saved raw: `raw/2026-11-21-what-is-llm-inference.md` (no images; page has an interactive visualizer only)
+- Emphasis (user): serving → control-plane domain mapping; per-token billing and serverless vs self-hosted; optimization reading roadmap; interview vocabulary. Frameworks kept on one page, not split into entities.
+- Created: [[2026-11-21-what-is-llm-inference]], [[llm-inference]], [[prefill-and-decode]], [[inference-serving]], [[inference-frameworks]], [[inference-optimization]], [[per-token-pricing]]
+- Updated: [[inference-batching]], [[kv-cache]], [[overview]], [[index]]

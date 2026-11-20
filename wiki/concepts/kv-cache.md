@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [provisioning, tenancy-quotas, metering-billing, career]
-sources: [2026-11-12-transformer-inference-arithmetic]
+sources: [2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference]
 created: 2026-11-12
-updated: 2026-11-12
+updated: 2026-11-21
 ---
 
 # KV cache
@@ -16,7 +16,7 @@ The **kv cache** (also "past cache" or "context cache") is a GPU-memory buffer h
 
 - A transformer generates text one token at a time ("autoregressive": each output becomes part of the next input). Producing each token runs the whole model once, and attention needs the key/value vectors of every earlier token. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - Without a cache, each step recomputes those vectors from the start, so total sampling cost grows **quadratically** in the number of tokens. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- The prompt phase ("prefill") can process all prompt tokens in parallel and fills the cache; the sampling phase ("decode") adds one token per step. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- The prompt phase ("prefill") can process all prompt tokens in parallel and fills the cache; the sampling phase ("decode") adds one token per step. (src: [[2026-11-12-transformer-inference-arithmetic]]) See [[prefill-and-decode]].
 
 ### Cost
 
@@ -34,6 +34,11 @@ The **kv cache** (also "past cache" or "context cache") is a GPU-memory buffer h
 
 - Under tensor parallelism the cache is split by attention head across GPUs, so each GPU stores only its heads' share. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
+### Optimizations built on the cache
+
+- The handbook names two cache optimizations. **KV cache management**: reusing or offloading attention caches to handle long prompts efficiently. **Prefix caching**: caching common prompt segments to avoid redundant computation. Neither is explained in this source. Roadmap: [[inference-optimization]]. (src: [[2026-11-21-what-is-llm-inference]]) A typical shared prefix is a system prompt reused across requests. (general knowledge)
+- Offloading moves cache out of GPU memory to cheaper, slower memory (CPU RAM, SSD), which relieves the capacity limit in [[gpu-memory-capacity]]. (general knowledge)
+
 ## Why it matters for a GPU cloud
 
 - Cache size is why LLM serving memory is a function of *context length*, not just model size, so quota systems and schedulers that count "one replica = one model" will mispredict capacity. See [[gpu-memory-capacity]]. (src + general knowledge)
@@ -46,3 +51,5 @@ The **kv cache** (also "past cache" or "context cache") is a GPU-memory buffer h
 - [[inference-batching]]: cache size caps how many requests can run together.
 - [[inference-latency-model]]: cache reads appear as an extra memory term.
 - [[model-parallelism]]: the cache is sharded with the heads.
+- [[prefill-and-decode]]: prefill writes the cache, decode reads it.
+- [[inference-optimization]]: prefix caching and cache offloading.

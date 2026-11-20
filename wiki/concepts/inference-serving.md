@@ -1,0 +1,54 @@
+---
+type: concept
+tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, career]
+sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic]
+created: 2026-11-21
+updated: 2026-11-21
+---
+
+# Inference serving
+
+**Serving** is everything required to turn [[llm-inference]] (the computation) into a reliable production service that applications can call. Analogy: inference is the kitchen cooking one dish. Serving is the restaurant around it: taking orders, seating guests, deciding which orders cook together, adding cooks at rush hour, and handing out the bill. For a GPU cloud, most of the serving list is control-plane work. (src: [[2026-11-21-what-is-llm-inference]])
+
+## Details
+
+### The serving responsibilities (the handbook's list)
+
+API surface (HTTP/gRPC), request queuing and scheduling, batching across concurrent requests, load balancing across replicas, autoscaling, model loading and version management, health checks, observability, resource allocation. (src: [[2026-11-21-what-is-llm-inference]])
+
+A **replica** is one running copy of the model on its own GPU(s). Serving at scale means many replicas behind a load balancer. (general knowledge)
+
+### Mapped to the four control-plane domains
+
+The handbook gives the list; the mapping below is this wiki's (general knowledge). Some items are usually handled *inside* the [[inference-frameworks|inference framework]] on a single replica, and others by the *platform* across replicas and tenants.
+
+| Responsibility | Domain | Usually inside the framework or in the platform? | What the control plane has to decide |
+| --- | --- | --- | --- |
+| API surface (HTTP/gRPC) | Provisioning APIs | Both: the framework exposes an endpoint, the platform adds auth and routing | Create/delete endpoint APIs, model + SKU choice, API keys |
+| Resource allocation | Provisioning; tenancy-quotas | Platform | How many GPUs of which SKU per replica. Sizing from [[gpu-memory-capacity]] and [[model-parallelism]] |
+| Model loading and version management | Lifecycle | Platform orchestrates, framework loads | Where weights are stored, cold-start time, rolling upgrades between model versions |
+| Health checks | Lifecycle | Both | Restarting failed replicas, draining bad GPUs/nodes ([[nvidia-smi]]) |
+| Autoscaling | Lifecycle; metering-billing | Platform | Scale on which signal (queue depth, tokens/sec, latency), min/max replicas, who pays for idle replicas |
+| Load balancing across replicas | Provisioning; lifecycle | Platform | Routing policy. Cache-aware routing matters once replicas hold different prefixes ([[inference-optimization]]) |
+| Request queuing and scheduling | Tenancy-quotas | Both: framework schedules within a replica, platform queues across tenants | Per-tenant rate limits, priority, fairness, what happens when a queue is full |
+| Batching across concurrent requests | Tenancy-quotas; metering-billing | Framework | Tenants share a batch, so isolation and per-tenant accounting are required ([[inference-batching]]) |
+| Observability | Metering-billing; lifecycle | Both | Per-tenant token counts for billing, latency/throughput SLOs, GPU metrics ([[gpu-utilization-metrics]]) |
+
+### Serverless vs self-hosted
+
+- **Serverless API:** the provider runs all of the above; the customer sends prompts and pays per token. (src: [[2026-11-21-what-is-llm-inference]])
+- **Self-hosted / hybrid:** the customer (or a GPU cloud on their behalf) runs the serving stack. Teams move here when they hit limits on cost, latency, customization, or compliance. (src: [[2026-11-21-what-is-llm-inference]])
+- A GPU cloud can sell at either level: raw GPUs (customer runs serving), managed endpoints (platform runs serving on dedicated GPUs), or a serverless per-token API (platform runs serving on shared GPUs). Each level moves more of the table above into the provider's control plane. (general knowledge) Pricing consequences: [[per-token-pricing]].
+
+## Related
+
+- [[llm-inference]]: the computation being served.
+- [[inference-frameworks]]: engines that do both inference and the per-replica part of serving.
+- [[inference-batching]]: the main lever for serving cost.
+- [[per-token-pricing]]: how serving is billed.
+- [[2026-11-12-sizing-a-gpu-inference-deployment]]: sizing arithmetic for the "resource allocation" row.
+
+## Open questions
+
+- Where exactly do real platforms (e.g. KServe, NVIDIA Triton/Dynamo, managed endpoints at GPU clouds) draw the framework/platform boundary? Needs sources.
+- How do multi-tenant shared replicas isolate tenants (noisy neighbors, data separation in a shared batch and shared cache)?

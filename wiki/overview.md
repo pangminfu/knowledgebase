@@ -1,9 +1,9 @@
 ---
 type: overview
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, career]
-sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic]
+sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference]
 created: 2026-11-10
-updated: 2026-11-12
+updated: 2026-11-21
 ---
 
 # Overview
@@ -38,20 +38,38 @@ Control-plane consequences (general knowledge unless cited):
 - **Tokens/second is the inference-native metering unit**, and it is not fixed per SKU: it depends on the batch the provider can pack (src: [[2026-11-12-transformer-inference-arithmetic]]; product framing: general knowledge).
 - **Memory-bound replicas look busy.** GPU-Util can read high while the GPU does a fraction of its peak flops ([[gpu-utilization-metrics]]).
 
+## The layer the control plane owns: serving
+
+The third source adds vocabulary for the layer above the GPU arithmetic. **Inference** is the computation: tokens in, next-token probabilities out, through [[prefill-and-decode]] ([[llm-inference]]). **Serving** is everything that turns it into a production service: API, queuing and scheduling, batching across requests, load balancing, autoscaling, model versioning, health checks, observability, resource allocation ([[inference-serving]]). Engines like vLLM, SGLang, TensorRT-LLM, and MAX do both on each replica ([[inference-frameworks]]). (src: [[2026-11-21-what-is-llm-inference]])
+
+```mermaid
+flowchart TB
+  CP["Control plane (platform)<br/>endpoints · quotas · autoscaling · routing · metering"] --> R1["Replica: inference framework<br/>batching · KV cache · streaming"]
+  CP --> R2["Replica ..."]
+  R1 --> G["GPU(s): prefill + decode<br/>bound by memory, bandwidth, flops"]
+```
+
+Control-plane consequences (general knowledge unless cited):
+
+- **The serving list is the job description.** Each serving responsibility maps to one of the four domains; the mapping table is in [[inference-serving]].
+- **Two products, two meters.** Serverless APIs bill per token and carry the utilization risk; self-hosted customers rent GPU-hours and carry it themselves (src for per-token serverless: [[2026-11-21-what-is-llm-inference]]). See [[per-token-pricing]].
+- **Optimizations move capacity.** Continuous batching, quantization, and prefix caching raise tokens per GPU, so GPU-denominated quotas and token-denominated prices drift apart. See [[inference-optimization]] for the reading roadmap.
+
 ## Coverage so far
 
 | Domain | Status |
 | --- | --- |
-| Provisioning APIs | GPU/SKU background plus inference sizing rules (how many GPUs a model needs); no actual API sources yet |
-| Tenancy and quotas | Concurrency-as-memory derived from inference arithmetic; no quota/tenancy system sources yet |
-| Kubernetes and bare-metal lifecycle | Not covered beyond nvidia-smi and the gang-scheduling constraint |
-| Metering and billing | Utilization metrics and tokens-vs-GPU-hours reasoning; no billing-pipeline sources |
-| Career | Interview talking points on GPU performance, capacity, batching, and parallelism |
+| Provisioning APIs | GPU/SKU background, inference sizing rules, and the serving responsibilities an endpoint API must cover; no actual API sources yet |
+| Tenancy and quotas | Concurrency-as-memory from inference arithmetic; serving-side queuing/rate limits identified but unsourced |
+| Kubernetes and bare-metal lifecycle | Not covered beyond nvidia-smi, gang scheduling, and the lifecycle rows of serving (health checks, model loading, autoscaling) |
+| Metering and billing | Utilization metrics, tokens-vs-GPU-hours reasoning, per-token vs GPU-hour products; no billing-pipeline sources |
+| Career | Interview talking points on GPU performance, capacity, batching, parallelism, and inference vs serving |
 
 ## Suggested next sources
 
 - A provider's GPU instance docs and pricing page (e.g. AWS EC2 P-series, GCP A3, CoreWeave): provisioning, billing granularity, and how they present concurrency.
-- vLLM / TensorRT-LLM documentation on continuous batching and paged attention: the scheduling half of serving that both sources omit.
+- Modular LLM Inference Handbook follow-on chapters: continuous batching, prefix caching, quantization, routing, serverless vs self-hosted (ordered list in [[inference-optimization]]).
+- vLLM / TensorRT-LLM documentation on continuous batching and paged attention: the scheduling half of serving, from the engine authors.
 - Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling: lifecycle.
 - Kubernetes ResourceQuota and cloud quota docs: tenancy and quotas.
 - NVIDIA DCGM docs: real utilization metrics for metering.

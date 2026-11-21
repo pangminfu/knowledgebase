@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [provisioning, lifecycle, career]
-sources: [2026-11-21-what-is-llm-inference]
+sources: [2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference]
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 ---
 
 # Inference frameworks (inference servers)
@@ -28,8 +28,11 @@ An **inference server** is the program that loads a model onto GPUs, accepts req
 | SGLang | Same | Open source (general knowledge) |
 | MAX | Same | Made by Modular, the handbook's publisher (general knowledge) |
 | TensorRT LLM | Same | NVIDIA's; successor to FasterTransformer, which [[2026-11-12-transformer-inference-arithmetic]] benchmarked (general knowledge) |
+| LMDeploy | Listed among inference tools in the training-vs-inference table (src: [[2026-11-22-training-vs-inference]]) | Open source, from the InternLM / Shanghai AI Lab ecosystem (general knowledge) |
 
-(src: [[2026-11-21-what-is-llm-inference]] for the list) Each will get its own entity page once a source covers it in depth.
+(src: [[2026-11-21-what-is-llm-inference]] for the first four, [[2026-11-22-training-vs-inference]] for LMDeploy) Each will get its own entity page once a source covers it in depth.
+
+These are *inference* tools. Training uses a different stack (PyTorch, JAX, DeepSpeed, Megatron), so a GPU cloud that serves both phases deploys different software for each ([[training-vs-inference]]). (src: [[2026-11-22-training-vs-inference]])
 
 ## Why it matters for a GPU cloud
 
@@ -41,6 +44,7 @@ An **inference server** is the program that loads a model onto GPUs, accepts req
 - [[inference-serving]]: the per-replica part of serving lives here; the cross-replica part is the platform's.
 - [[inference-optimization]]: the techniques these frameworks implement.
 - [[llm-inference]]: the computation they run.
+- [[training-vs-inference]]: training tools vs inference tools.
 
 ## Open questions
 

@@ -1,9 +1,9 @@
 ---
 type: overview
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, career]
-sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference]
+sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference]
 created: 2026-11-10
-updated: 2026-11-21
+updated: 2026-11-22
 ---
 
 # Overview
@@ -55,15 +55,24 @@ Control-plane consequences (general knowledge unless cited):
 - **Two products, two meters.** Serverless APIs bill per token and carry the utilization risk; self-hosted customers rent GPU-hours and carry it themselves (src for per-token serverless: [[2026-11-21-what-is-llm-inference]]). See [[per-token-pricing]].
 - **Optimizations move capacity.** Continuous batching, quantization, and prefix caching raise tokens per GPU, so GPU-denominated quotas and token-denominated prices drift apart. See [[inference-optimization]] for the reading roadmap.
 
+## Two workloads: training vs inference
+
+A model's life has two phases. **Training** (build) runs once or periodically: it is a long job on multi-node clusters and is mostly a one-time cost. **Inference** (operate) runs on every request, in milliseconds to seconds, and costs money for as long as there is traffic, so it often becomes the larger expense over time. [[fine-tuning]] changes weights, so it counts as training. See [[training-vs-inference]]. (src: [[2026-11-22-training-vs-inference]])
+
+Control-plane consequences (general knowledge):
+
+- **Two job shapes.** Training is an all-or-nothing batch job: a gang-scheduled cluster, checkpoints, and reserved GPU-hours. Inference is an always-on service: autoscaled replicas, rolling upgrades, and per-token or endpoint billing. Every domain needs a version of each; the per-domain table is in [[training-vs-inference]].
+- **The handoff is a model artifact.** Training or fine-tuning writes weights, and serving loads them. Storage, versioning, and cold start sit at that seam.
+
 ## Coverage so far
 
 | Domain | Status |
 | --- | --- |
-| Provisioning APIs | GPU/SKU background, inference sizing rules, and the serving responsibilities an endpoint API must cover; no actual API sources yet |
-| Tenancy and quotas | Concurrency-as-memory from inference arithmetic; serving-side queuing/rate limits identified but unsourced |
-| Kubernetes and bare-metal lifecycle | Not covered beyond nvidia-smi, gang scheduling, and the lifecycle rows of serving (health checks, model loading, autoscaling) |
-| Metering and billing | Utilization metrics, tokens-vs-GPU-hours reasoning, per-token vs GPU-hour products; no billing-pipeline sources |
-| Career | Interview talking points on GPU performance, capacity, batching, parallelism, and inference vs serving |
+| Provisioning APIs | GPU/SKU background, inference sizing rules, the serving responsibilities an endpoint API must cover, and training-cluster vs endpoint provisioning shapes (unsourced mapping); no actual API sources yet |
+| Tenancy and quotas | Concurrency-as-memory from inference arithmetic; serving-side queuing/rate limits and training capacity blocks identified but unsourced |
+| Kubernetes and bare-metal lifecycle | Not covered beyond nvidia-smi, gang scheduling, the lifecycle rows of serving, and the batch-job vs service contrast |
+| Metering and billing | Utilization metrics, tokens-vs-GPU-hours reasoning, per-token vs GPU-hour products, inference as the recurring cost; no billing-pipeline sources |
+| Career | Interview talking points on GPU performance, capacity, batching, parallelism, inference vs serving, and training vs inference |
 
 ## Suggested next sources
 
@@ -73,3 +82,4 @@ Control-plane consequences (general knowledge unless cited):
 - Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling: lifecycle.
 - Kubernetes ResourceQuota and cloud quota docs: tenancy and quotas.
 - NVIDIA DCGM docs: real utilization metrics for metering.
+- GPU cloud docs on training capacity (reserved clusters, capacity blocks, managed Slurm/Kubernetes): the training half of provisioning, quotas, and lifecycle.

@@ -11,6 +11,7 @@ Catalog of every page in the wiki. One line per page: link — summary.
 - [[2026-11-10-deep-learning-brrrr-first-principles]] — Horace He (2022): compute vs memory-bandwidth vs overhead regimes on GPUs; why spec-sheet TFLOPS and GPU-Util mislead
 - [[2026-11-12-transformer-inference-arithmetic]] — kipply (2022): closed-form LLM serving math — kv cache size, 208 flops/byte, capacity → batch size, tensor-parallel comms floor; validated against FasterTransformer
 - [[2026-11-21-what-is-llm-inference]] — Modular LLM Inference Handbook intro: inference vs serving, inference servers/frameworks, optimization techniques list, serverless per-token vs self-hosted
+- [[2026-11-22-training-vs-inference]] — Modular handbook: training (build, mostly one-time, multi-node, hours–weeks) vs inference (operate, ongoing, ms–s, scales with traffic); comparison table; fine-tuning is training
 
 ## Concepts
 
@@ -31,6 +32,8 @@ Catalog of every page in the wiki. One line per page: link — summary.
 - [[inference-frameworks]] — inference servers/frameworks (vLLM, SGLang, TensorRT-LLM, MAX): what they do per replica and why the control plane cares
 - [[inference-optimization]] — hub and reading roadmap: which bottleneck each technique (batching, caching, quantization, speculative decoding, parallelism, routing) attacks
 - [[per-token-pricing]] — per-token vs GPU-hour products; why token cost depends on batching; what each metering pipeline must capture
+- [[training-vs-inference]] — the build vs operate lifecycle; comparison table; how each workload differs for provisioning, quotas, lifecycle, and billing
+- [[fine-tuning]] — adapting an existing model by updating some weights; training-shaped job whose output the serving side deploys
 
 ## Entities
 

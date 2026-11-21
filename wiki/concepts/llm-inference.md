@@ -1,14 +1,14 @@
 ---
 type: concept
 tags: [provisioning, metering-billing, career]
-sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic]
+sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-22-training-vs-inference]
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 ---
 
 # LLM inference
 
-**LLM inference** is *running* a trained large language model: a prompt goes in and generated text (or code, a summary, a translation) comes out. Training is how the model learns its parameters (the billions of numbers that make up the model). Inference uses those parameters without changing them. Analogy: training writes the cookbook, inference cooks a dish from it on request. Strictly, inference is only the computation. The production system around it is [[inference-serving]]. (src: [[2026-11-21-what-is-llm-inference]])
+**LLM inference** is *running* a trained large language model: a prompt goes in and generated text (or code, a summary, a translation) comes out. Training is how the model learns its parameters (the billions of numbers that make up the model). Inference uses those parameters without changing them. Analogy: training writes the cookbook, inference cooks a dish from it on request. Strictly, inference is only the computation. The production system around it is [[inference-serving]]. (src: [[2026-11-21-what-is-llm-inference]]) Inference runs continuously on every request, so its cost keeps growing with traffic, unlike the mostly one-time cost of training ([[training-vs-inference]]). (src: [[2026-11-22-training-vs-inference]])
 
 ## Details
 
@@ -54,3 +54,5 @@ flowchart LR
 - [[inference-frameworks]]: software that performs inference and usually serving too (vLLM, SGLang, TensorRT-LLM, MAX).
 - [[inference-optimization]]: techniques to make inference faster and cheaper.
 - [[inference-latency-model]]: how long one decode step takes, from first principles.
+- [[training-vs-inference]]: how inference differs from training in workload, cost, and what the control plane does with each.
+- [[fine-tuning]]: changes weights, so it is training, not inference.

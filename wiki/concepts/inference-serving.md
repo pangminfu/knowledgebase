@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, career]
-sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic]
+sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-22-training-vs-inference]
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 ---
 
 # Inference serving
@@ -15,6 +15,8 @@ updated: 2026-11-21
 ### The serving responsibilities (the handbook's list)
 
 API surface (HTTP/gRPC), request queuing and scheduling, batching across concurrent requests, load balancing across replicas, autoscaling, model loading and version management, health checks, observability, resource allocation. (src: [[2026-11-21-what-is-llm-inference]])
+
+A second handbook page defines model serving as the production process of making a trained model available to applications: packaging it, loading it onto suitable hardware, exposing it through an API, monitoring it, and keeping **latency, reliability, security, and cost** under control. This adds packaging and security to the list above. (src: [[2026-11-22-training-vs-inference]])
 
 A **replica** is one running copy of the model on its own GPU(s). Serving at scale means many replicas behind a load balancer. (general knowledge)
 
@@ -47,6 +49,7 @@ The handbook gives the list; the mapping below is this wiki's (general knowledge
 - [[inference-batching]]: the main lever for serving cost.
 - [[per-token-pricing]]: how serving is billed.
 - [[2026-11-12-sizing-a-gpu-inference-deployment]]: sizing arithmetic for the "resource allocation" row.
+- [[training-vs-inference]]: serving is the "operate" half of the model lifecycle, and the always-on workload the control plane runs.
 
 ## Open questions
 

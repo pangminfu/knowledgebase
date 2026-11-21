@@ -37,3 +37,9 @@ Append-only. Entry format: `## [YYYY-MM-DD] <ingest|query|lint|schema|init> | <t
 - Emphasis (user): serving → control-plane domain mapping; per-token billing and serverless vs self-hosted; optimization reading roadmap; interview vocabulary. Frameworks kept on one page, not split into entities.
 - Created: [[2026-11-21-what-is-llm-inference]], [[llm-inference]], [[prefill-and-decode]], [[inference-serving]], [[inference-frameworks]], [[inference-optimization]], [[per-token-pricing]]
 - Updated: [[inference-batching]], [[kv-cache]], [[overview]], [[index]]
+
+## [2026-11-22] ingest | Training vs. inference (Modular LLM Inference Handbook)
+- Saved raw: `raw/2026-11-22-training-vs-inference.md` (no images; the interactive lifecycle visualizer is described in frontmatter)
+- Emphasis (user): control-plane implications of training vs inference workloads; fine-tuning as a separate stub page
+- Created: [[2026-11-22-training-vs-inference]], [[training-vs-inference]], [[fine-tuning]]
+- Updated: [[llm-inference]], [[inference-serving]], [[inference-frameworks]] (added LMDeploy), [[per-token-pricing]], [[overview]], [[index]]

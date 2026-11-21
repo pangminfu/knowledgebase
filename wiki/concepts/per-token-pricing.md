@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [metering-billing, tenancy-quotas, career]
-sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-10-deep-learning-brrrr-first-principles]
+sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-10-deep-learning-brrrr-first-principles, 2026-11-22-training-vs-inference]
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 ---
 
 # Per-token pricing
@@ -40,6 +40,7 @@ updated: 2026-11-21
 
 - A GPU cloud usually sells both: raw GPU-hours to customers who self-host, and possibly managed or serverless endpoints. Its control plane then needs two metering pipelines and two kinds of quota (GPUs vs tokens/requests per minute). (general knowledge)
 - Token quotas (rate limits) protect shared replicas. GPU quotas protect capacity. They are not interchangeable, because tokens per GPU varies with batch, context length, and model. (general knowledge; variability: src [[2026-11-12-transformer-inference-arithmetic]])
+- Inference spend is ongoing and grows with traffic. Over a model's life it often exceeds the mostly one-time training cost. (src: [[2026-11-22-training-vs-inference]]) Training capacity, by contrast, is usually sold as reserved GPU-hours, so a GPU cloud serving both phases also runs both meters ([[training-vs-inference]]). (general knowledge)
 
 ## Related
 
@@ -47,6 +48,7 @@ updated: 2026-11-21
 - [[inference-batching]]: sets cost per token.
 - [[gpu-utilization-metrics]]: GPU-side metrics and their pitfalls.
 - [[2026-11-12-sizing-a-gpu-inference-deployment]]: worked numbers behind cost per token.
+- [[training-vs-inference]]: why inference is a recurring cost while training is mostly one-time.
 
 ## Open questions
 

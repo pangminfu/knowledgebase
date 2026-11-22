@@ -1,9 +1,9 @@
 ---
 type: entity
 tags: [lifecycle, provisioning, tenancy-quotas]
-sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app]
+sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app]
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-23
 ---
 
 # Kubernetes
@@ -12,11 +12,11 @@ updated: 2026-11-22
 
 ## Details
 
-- **Core objects so far:** [[kubernetes-pod|Pod]] (the unit it runs and schedules), [[kubernetes-node|Node]] (a worker machine, virtual or physical), [[kubernetes-deployment|Deployment]] (creates and replaces Pods, through a ReplicaSet), [[kubernetes-service|Service]] (a stable address and load balancer for a set of Pods). (src: [[2026-11-22-k8s-viewing-pods-and-nodes]], [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
+- **Core objects so far:** [[kubernetes-pod|Pod]] (the unit it runs and schedules), [[kubernetes-node|Node]] (a worker machine, virtual or physical), [[kubernetes-deployment|Deployment]] (creates and replaces Pods, through a [[kubernetes-replicaset|ReplicaSet]]), [[kubernetes-service|Service]] (a stable address and load balancer for a set of Pods). (src: [[2026-11-22-k8s-viewing-pods-and-nodes]], [[2026-11-22-k8s-using-a-service-to-expose-your-app]], [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
 - **Labels and selectors** are the grouping primitive: objects carry key/value [[kubernetes-labels-and-selectors|labels]], and other objects find them by label query instead of by name. Every object is defined in YAML or JSON. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
 - **Two halves:** the [[control-plane]] manages Nodes and schedules Pods; every Node runs a [[kubelet]] and a container runtime such as [[containerd]]. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - **Interface:** everything is an API object on the control plane's REST API, e.g. `/api/v1/namespaces/default/pods/<name>`. [[kubectl]] is the command-line client for it. (URL path: src: [[2026-11-22-k8s-viewing-pods-and-nodes]]; "everything is an API object": general knowledge)
-- **Declarative model:** you store *desired state*; controllers continuously reconcile actual state toward it. This is why a lost Pod comes back without anyone asking. (general knowledge)
+- **Declarative model:** you store *desired state*; controllers continuously reconcile actual state toward it. This is why a lost Pod comes back without anyone asking. (general knowledge) [[kubernetes-scaling|Scaling]] shows it directly: you change a Deployment's replica count, and `kubectl get rs` shows DESIRED vs CURRENT while the ReplicaSet closes the gap. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
 - **Namespaces** partition one cluster into named groups of objects (the tutorial's Pod lives in `default`). They are the basic unit for per-team or per-tenant access control and quotas. (namespace in URL: src; role: general knowledge)
 
 ## Why it matters for a GPU cloud
@@ -34,4 +34,5 @@ General knowledge.
 - [[control-plane]]: Kubernetes' control plane vs a GPU cloud's.
 - [[kubectl]]: how you talk to it.
 - [[kubernetes-service]], [[kubernetes-labels-and-selectors]]: how workloads are addressed and grouped.
-- [[2026-11-22-k8s-viewing-pods-and-nodes]], [[2026-11-22-k8s-using-a-service-to-expose-your-app]]: the tutorial modules this page is based on.
+- [[kubernetes-scaling]], [[kubernetes-replicaset]]: how the number of Pods is set and enforced.
+- [[2026-11-22-k8s-viewing-pods-and-nodes]], [[2026-11-22-k8s-using-a-service-to-expose-your-app]], [[2026-11-23-k8s-running-multiple-instances-of-your-app]]: the tutorial modules this page is based on.

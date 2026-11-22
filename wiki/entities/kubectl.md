@@ -1,9 +1,9 @@
 ---
 type: entity
 tags: [lifecycle]
-sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app]
+sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app]
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-23
 ---
 
 # kubectl (cheat sheet)
@@ -71,6 +71,26 @@ kubectl exec -ti $POD_NAME -- curl http://localhost:8080   # app still answers f
 - `-l` takes a [[kubernetes-labels-and-selectors|label selector]] and works with `get`, `delete`, and most other verbs. (src for get/delete: [[2026-11-22-k8s-using-a-service-to-expose-your-app]]; "most other verbs": general knowledge)
 - `kubectl expose` is a shortcut that builds a [[kubernetes-service|Service]] from an existing Deployment's labels and ports. Production setups usually write the Service as YAML and `kubectl apply` it. (general knowledge)
 
+### Scaling (Module 5)
+
+All from the source (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]):
+
+```shell
+kubectl expose deployment/kubernetes-bootcamp --type="LoadBalancer" --port 8080   # the Service this module assumes
+
+kubectl get deployments                                # READY / UP-TO-DATE / AVAILABLE / AGE
+kubectl get rs                                         # ReplicaSets: DESIRED vs CURRENT
+kubectl scale deployments/kubernetes-bootcamp --replicas=4   # scale out (set desired count)
+kubectl get pods -o wide                               # 4 Pods, each with its own IP and Node
+kubectl describe deployments/kubernetes-bootcamp       # replica count + scaling events
+kubectl describe services/kubernetes-bootcamp          # Service IP and ports
+curl http://"$(minikube ip):$NODE_PORT"                # repeat: a different Pod answers each time
+kubectl scale deployments/kubernetes-bootcamp --replicas=2   # scale down; 2 Pods terminated
+```
+
+- `--replicas=N` also works when creating: `kubectl create deployment <name> --image=<image> --replicas=N`. (`--replicas` on create: src; full command form: general knowledge)
+- `kubectl scale` only sets the desired count; the [[kubernetes-replicaset|ReplicaSet]] does the work. Watch it converge with `kubectl get rs` or `kubectl rollout status deployment/<name>`. (first part: src; `rollout status`: general knowledge) See [[kubernetes-scaling]].
+
 ### Usage notes
 
 - `describe` works on most objects: Nodes, Pods, Deployments. Its output is meant for humans, not for scripts. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]]) For scripts, use `-o json`, `-o yaml`, or `-o go-template` as in the `POD_NAME` example. (`-o go-template`: src; json/yaml: general knowledge)
@@ -94,6 +114,7 @@ General knowledge, not from the source; useful on GPU clusters.
 ## Related
 
 - [[kubernetes]]: the system it controls.
-- [[kubernetes-pod]], [[kubernetes-node]], [[kubernetes-deployment]], [[kubernetes-service]]: the objects these commands act on.
+- [[kubernetes-pod]], [[kubernetes-node]], [[kubernetes-deployment]], [[kubernetes-replicaset]], [[kubernetes-service]]: the objects these commands act on.
+- [[kubernetes-scaling]]: what `kubectl scale` sets in motion.
 - [[control-plane]]: the API server kubectl talks to.
 - [[nvidia-smi]]: the GPU-side counterpart for triage.

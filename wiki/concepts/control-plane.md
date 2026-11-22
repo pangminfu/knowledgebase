@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
-sources: [2026-11-22-k8s-viewing-pods-and-nodes]
+sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-23-k8s-running-multiple-instances-of-your-app]
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-23
 ---
 
 # Control plane
@@ -20,7 +20,8 @@ The **control plane** is the part of a system that *decides and manages*; the **
   - **API server:** the front door. Every request, from [[kubectl]] or anything else, goes through its REST API. The tutorial's proxy URL `/api/v1/namespaces/default/pods/...` is a path on this API (path: src).
   - **etcd:** the database holding the cluster's desired and current state.
   - **Scheduler:** picks a Node for each new Pod.
-  - **Controller manager:** runs controllers (e.g. for [[kubernetes-deployment|Deployments]]) that keep comparing desired state to actual state and fixing the difference. This loop is called **reconciliation**.
+  - **Controller manager:** runs controllers (e.g. for [[kubernetes-deployment|Deployments]] and [[kubernetes-replicaset|ReplicaSets]]) that keep comparing desired state to actual state and fixing the difference. This loop is called **reconciliation**.
+- Reconciliation in action: `kubectl scale --replicas=4` only records a new desired count. The ReplicaSet's DESIRED becomes 4, and Pods are created until CURRENT matches ([[kubernetes-scaling]]). (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
 - The Nodes, kubelets, and containers doing the work are the data plane. (general knowledge)
 
 ### Level 2: a GPU cloud's control plane
@@ -43,5 +44,6 @@ flowchart TB
 - [[kubernetes]]: the most common lower-level control plane in GPU clouds.
 - [[kubelet]]: the control plane's agent on each Node.
 - [[kubernetes-scheduling]]: one of its core jobs.
+- [[kubernetes-scaling]]: reconciliation driven by a changed replica count.
 - [[inference-serving]]: serving responsibilities, mapped to the four domains.
 - [[overview]]: where each domain stands in this wiki.

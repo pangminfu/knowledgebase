@@ -1,9 +1,9 @@
 ---
 type: overview
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
-sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference, 2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app]
+sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference, 2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app]
 created: 2026-11-10
-updated: 2026-11-22
+updated: 2026-11-23
 ---
 
 # Overview
@@ -84,13 +84,24 @@ Control-plane consequences (general knowledge):
 - **Per-connection balancing is not enough for LLMs.** Long, streamed requests and per-replica [[kv-cache]] contents call for request-level, cache-aware routing above the Service ([[inference-serving]]).
 - **Labels are the cross-domain tagging tool.** Node labels select GPU SKUs (provisioning), tenant labels group objects (tenancy), version labels drive rollouts (lifecycle), and cost tools attribute GPU-hours by label (metering). Because labels are mutable, billing-relevant ones must be set and guarded by the platform.
 
+## Sizing the fleet: scaling replicas
+
+[[kubernetes-scaling|Scaling]] means changing one number: a Deployment's replica count, its desired state. Its [[kubernetes-replicaset|ReplicaSet]] compares DESIRED with CURRENT and creates or terminates Pods to close the gap. New Pods are scheduled to Nodes with free resources, and scaling to zero terminates all Pods. The Service tracks running Pods through endpoints, so traffic spreads across new replicas automatically and the address never changes. Multiple replicas are also what make zero-downtime rolling updates possible. Autoscaling exists; it writes the same number automatically. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
+
+Control-plane consequences (general knowledge):
+
+- **The replica count is the knob every domain touches.** Provisioning sets min/max replicas, quotas cap them (max replicas × GPUs per replica), autoscalers move them, and GPU-hour metering integrates them over time.
+- **On GPUs, scale-out is not instant and not guaranteed.** New replicas stay Pending without whole free GPUs ([[kubernetes-scheduling]]), then pay a cold start loading weights. LLM autoscalers scale early and on queue/KV-cache signals, not CPU or GPU-Util ([[gpu-utilization-metrics]]).
+- **Scale-to-zero is a pricing decision.** It saves idle GPU-hours at the cost of a cold start. Someone pays for minimum replicas: the customer on a dedicated endpoint, the provider on a serverless API ([[per-token-pricing]]).
+- **Scale-down must drain.** Long streamed responses need a longer termination grace period than the 30 s default, or they are cut off mid-stream.
+
 ## Coverage so far
 
 | Domain | Status |
 | --- | --- |
 | Provisioning APIs | GPU/SKU background, inference sizing rules, the serving responsibilities an endpoint API must cover, and training-cluster vs endpoint provisioning shapes (unsourced mapping); no actual API sources yet |
 | Tenancy and quotas | Concurrency-as-memory from inference arithmetic; serving-side queuing/rate limits and training capacity blocks identified but unsourced |
-| Kubernetes and bare-metal lifecycle | Kubernetes basics sourced (Pods, Nodes, kubelet, runtime, scheduling by free resources, replacement on Node failure, Services and Service types, labels/selectors, kubectl triage); GPU device plugins, gang scheduling, Node health/drain, readiness probes, and bare-metal provisioning still unsourced |
+| Kubernetes and bare-metal lifecycle | Kubernetes basics sourced (Pods, Nodes, kubelet, runtime, scheduling by free resources, replacement on Node failure, Services and Service types, labels/selectors, manual scaling via Deployment/ReplicaSet, endpoints, kubectl triage); autoscaling (HPA/cluster autoscaler), rolling updates, GPU device plugins, gang scheduling, Node health/drain, readiness probes, graceful termination, and bare-metal provisioning still unsourced |
 | Metering and billing | Utilization metrics, tokens-vs-GPU-hours reasoning, per-token vs GPU-hour products, inference as the recurring cost; no billing-pipeline sources |
 
 ## Suggested next sources
@@ -98,7 +109,7 @@ Control-plane consequences (general knowledge):
 - A provider's GPU instance docs and pricing page (e.g. AWS EC2 P-series, GCP A3, CoreWeave): provisioning, billing granularity, and how they present concurrency.
 - Modular LLM Inference Handbook follow-on chapters: continuous batching, prefix caching, quantization, routing, serverless vs self-hosted (ordered list in [[inference-optimization]]).
 - vLLM / TensorRT-LLM documentation on continuous batching and paged attention: the scheduling half of serving, from the engine authors.
-- Kubernetes Basics Module 2 (Deployments) and Module 5 (scaling); Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling (Kueue/Volcano): lifecycle.
+- Kubernetes Basics Module 2 (Deployments) and Module 6 (rolling updates); Kubernetes autoscaling docs (HPA, cluster autoscaler) and an LLM autoscaler (KServe or KEDA); Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling (Kueue/Volcano): lifecycle.
 - Gateway API Inference Extension / llm-d / KServe docs: how inference platforms route requests above a plain Service.
 - Kubernetes ResourceQuota and cloud quota docs: tenancy and quotas.
 - NVIDIA DCGM docs: real utilization metrics for metering.

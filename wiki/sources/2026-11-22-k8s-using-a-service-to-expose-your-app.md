@@ -76,4 +76,4 @@ A Service (`svc`, IP 1.1.1.1) with selector `app=A` sends traffic to every Pod l
 - A Service balances *connections* (layer 4). LLM requests are long, streamed, and benefit from prefix-cache-aware routing. What do inference platforms put in front of or instead of a plain Service (Gateway API Inference Extension, KServe, llm-d)? (general knowledge)
 - On bare-metal GPU clouds, who implements `type: LoadBalancer` when there is no hyperscaler load balancer (e.g. MetalLB, provider-built controllers)? (general knowledge)
 - How do readiness probes keep a Service from sending traffic to an inference Pod that is still loading weights?
-- Next tutorial module: "Running Multiple Instances of Your App" (scaling a Deployment behind a Service).
+- Next tutorial module: "Running Multiple Instances of Your App" (scaling a Deployment behind a Service). Ingested as [[2026-11-23-k8s-running-multiple-instances-of-your-app]].

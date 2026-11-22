@@ -3,7 +3,7 @@ type: concept
 tags: [tenancy-quotas, metering-billing, lifecycle, provisioning]
 sources: [2026-11-22-k8s-using-a-service-to-expose-your-app]
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-23
 ---
 
 # Labels and selectors (Kubernetes)
@@ -38,6 +38,7 @@ All general knowledge; not from the source.
 
 - [[kubernetes-service]]: the main consumer of label selectors in this source.
 - [[kubernetes-deployment]]: auto-labels its Pods and selects them.
+- [[kubernetes-replicaset]]: selects its Pods by label, including `pod-template-hash`.
 - [[kubernetes-pod]], [[kubernetes-node]]: the objects most often labeled.
 - [[kubectl]]: `-l` filtering and `kubectl label`.
 - [[kubernetes]]: namespaces, the hard-partition counterpart.

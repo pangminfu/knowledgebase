@@ -62,3 +62,9 @@ Append-only. Entry format: `## [YYYY-MM-DD] <ingest|query|lint|schema|init> | <t
 - Created: [[2026-11-22-k8s-using-a-service-to-expose-your-app]], [[kubernetes-service]], [[kubernetes-labels-and-selectors]]
 - Updated: [[kubernetes]], [[kubernetes-pod]], [[kubernetes-node]], [[kubernetes-deployment]], [[kubectl]], [[inference-serving]], [[2026-11-22-k8s-viewing-pods-and-nodes]] (question cross-link), [[overview]], [[index]]
 - Emphasis (user): Service types, labels as a general primitive, inference-endpoint mapping, kubectl commands
+
+## [2026-11-23] ingest | Running Multiple Instances of Your App (Kubernetes Basics, Module 5)
+- Saved raw: raw/2026-11-23-k8s-running-multiple-instances-of-your-app.md; images raw/assets/k8s-scale-1.svg, raw/assets/k8s-scale-2.svg
+- Created: [[2026-11-23-k8s-running-multiple-instances-of-your-app]], [[kubernetes-scaling]], [[kubernetes-replicaset]]
+- Updated: [[kubernetes-deployment]], [[kubernetes-service]], [[kubernetes-scheduling]], [[kubernetes-labels-and-selectors]], [[kubernetes]], [[kubectl]], [[control-plane]], [[inference-serving]], [[2026-11-22-k8s-using-a-service-to-expose-your-app]] (question cross-link), [[overview]], [[index]]
+- Emphasis (user): desired state and reconcile loop, GPU scaling implications, Service load balancing and endpoints, kubectl commands and status columns

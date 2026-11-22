@@ -1,7 +1,7 @@
 ---
 type: overview
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
-sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference, 2026-11-22-k8s-viewing-pods-and-nodes]
+sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference, 2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app]
 created: 2026-11-10
 updated: 2026-11-22
 ---
@@ -74,13 +74,23 @@ Control-plane consequences (general knowledge):
 - **Map the earlier pages onto Kubernetes objects.** A GPU Node is usually an 8-GPU bare-metal server. An inference replica is one Pod requesting GPUs, and an endpoint is a Deployment of such Pods. A Node failure costs a cold start while a replacement Pod reloads weights.
 - **GPUs are scheduled as whole, reserved units.** A requested GPU is held even when idle, so GPU-hour billing and capacity follow Pod lifetimes, not utilization ([[gpu-utilization-metrics]]). Multi-Node jobs need gang scheduling beyond the default scheduler ([[kubernetes-scheduling]]).
 
+## Reaching workloads: Services and labels
+
+Pods get new IPs whenever they are replaced, and Pod IPs are not reachable from outside the cluster. A [[kubernetes-service|Service]] gives a set of Pods one stable address, load-balances across them, and lets clients discover them. Its `type` sets how far it reaches: ClusterIP (in-cluster) ⊂ NodePort (a port on every Node) ⊂ LoadBalancer (a cloud load balancer); ExternalName is only a DNS alias. A Service picks its Pods with a selector over key/value [[kubernetes-labels-and-selectors|labels]], Kubernetes' grouping primitive. Deleting a Service removes the route in, not the Pods. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
+
+Control-plane consequences (general knowledge):
+
+- **An inference endpoint = Deployment + Service.** Replicas churn underneath; the customer's address does not. Readiness probes keep a Service from routing to a replica that is still loading weights.
+- **Per-connection balancing is not enough for LLMs.** Long, streamed requests and per-replica [[kv-cache]] contents call for request-level, cache-aware routing above the Service ([[inference-serving]]).
+- **Labels are the cross-domain tagging tool.** Node labels select GPU SKUs (provisioning), tenant labels group objects (tenancy), version labels drive rollouts (lifecycle), and cost tools attribute GPU-hours by label (metering). Because labels are mutable, billing-relevant ones must be set and guarded by the platform.
+
 ## Coverage so far
 
 | Domain | Status |
 | --- | --- |
 | Provisioning APIs | GPU/SKU background, inference sizing rules, the serving responsibilities an endpoint API must cover, and training-cluster vs endpoint provisioning shapes (unsourced mapping); no actual API sources yet |
 | Tenancy and quotas | Concurrency-as-memory from inference arithmetic; serving-side queuing/rate limits and training capacity blocks identified but unsourced |
-| Kubernetes and bare-metal lifecycle | Kubernetes basics sourced (Pods, Nodes, kubelet, runtime, scheduling by free resources, replacement on Node failure, kubectl triage); GPU device plugins, gang scheduling, Node health/drain, and bare-metal provisioning still unsourced |
+| Kubernetes and bare-metal lifecycle | Kubernetes basics sourced (Pods, Nodes, kubelet, runtime, scheduling by free resources, replacement on Node failure, Services and Service types, labels/selectors, kubectl triage); GPU device plugins, gang scheduling, Node health/drain, readiness probes, and bare-metal provisioning still unsourced |
 | Metering and billing | Utilization metrics, tokens-vs-GPU-hours reasoning, per-token vs GPU-hour products, inference as the recurring cost; no billing-pipeline sources |
 
 ## Suggested next sources
@@ -88,7 +98,8 @@ Control-plane consequences (general knowledge):
 - A provider's GPU instance docs and pricing page (e.g. AWS EC2 P-series, GCP A3, CoreWeave): provisioning, billing granularity, and how they present concurrency.
 - Modular LLM Inference Handbook follow-on chapters: continuous batching, prefix caching, quantization, routing, serverless vs self-hosted (ordered list in [[inference-optimization]]).
 - vLLM / TensorRT-LLM documentation on continuous batching and paged attention: the scheduling half of serving, from the engine authors.
-- Kubernetes Basics Module 2 (Deployments) and Module 4 (Services); Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling (Kueue/Volcano): lifecycle.
+- Kubernetes Basics Module 2 (Deployments) and Module 5 (scaling); Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling (Kueue/Volcano): lifecycle.
+- Gateway API Inference Extension / llm-d / KServe docs: how inference platforms route requests above a plain Service.
 - Kubernetes ResourceQuota and cloud quota docs: tenancy and quotas.
 - NVIDIA DCGM docs: real utilization metrics for metering.
 - GPU cloud docs on training capacity (reserved clusters, capacity blocks, managed Slurm/Kubernetes): the training half of provisioning, quotas, and lifecycle.

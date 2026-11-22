@@ -1,7 +1,7 @@
 ---
 type: entity
 tags: [lifecycle, provisioning, tenancy-quotas]
-sources: [2026-11-22-k8s-viewing-pods-and-nodes]
+sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app]
 created: 2026-11-22
 updated: 2026-11-22
 ---
@@ -12,7 +12,8 @@ updated: 2026-11-22
 
 ## Details
 
-- **Core objects so far:** [[kubernetes-pod|Pod]] (the unit it runs and schedules), [[kubernetes-node|Node]] (a worker machine, virtual or physical), [[kubernetes-deployment|Deployment]] (creates and replaces Pods). (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
+- **Core objects so far:** [[kubernetes-pod|Pod]] (the unit it runs and schedules), [[kubernetes-node|Node]] (a worker machine, virtual or physical), [[kubernetes-deployment|Deployment]] (creates and replaces Pods, through a ReplicaSet), [[kubernetes-service|Service]] (a stable address and load balancer for a set of Pods). (src: [[2026-11-22-k8s-viewing-pods-and-nodes]], [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
+- **Labels and selectors** are the grouping primitive: objects carry key/value [[kubernetes-labels-and-selectors|labels]], and other objects find them by label query instead of by name. Every object is defined in YAML or JSON. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
 - **Two halves:** the [[control-plane]] manages Nodes and schedules Pods; every Node runs a [[kubelet]] and a container runtime such as [[containerd]]. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - **Interface:** everything is an API object on the control plane's REST API, e.g. `/api/v1/namespaces/default/pods/<name>`. [[kubectl]] is the command-line client for it. (URL path: src: [[2026-11-22-k8s-viewing-pods-and-nodes]]; "everything is an API object": general knowledge)
 - **Declarative model:** you store *desired state*; controllers continuously reconcile actual state toward it. This is why a lost Pod comes back without anyone asking. (general knowledge)
@@ -23,13 +24,14 @@ updated: 2026-11-22
 General knowledge.
 
 - **Lifecycle:** Node health, draining, and replacement; Pod restarts; rolling upgrades of inference replicas.
-- **Provisioning:** a cloud "create endpoint" or "create cluster" API ends up creating Kubernetes objects.
-- **Tenancy and quotas:** namespaces, ResourceQuota, and dedicated Node pools are the Kubernetes-level isolation tools.
-- **Metering:** Pod start/stop times and GPU requests are the raw data behind GPU-hour billing.
+- **Provisioning:** a cloud "create endpoint" or "create cluster" API ends up creating Kubernetes objects, e.g. a Deployment plus a Service for an inference endpoint.
+- **Tenancy and quotas:** namespaces, ResourceQuota, and dedicated Node pools are the Kubernetes-level isolation tools; labels tag objects by tenant.
+- **Metering:** Pod start/stop times and GPU requests are the raw data behind GPU-hour billing, attributed to tenants by namespace and label.
 - GPUs need add-ons: the NVIDIA device plugin / GPU Operator, and a gang scheduler for multi-Node jobs ([[kubernetes-scheduling]]).
 
 ## Related
 
 - [[control-plane]]: Kubernetes' control plane vs a GPU cloud's.
 - [[kubectl]]: how you talk to it.
-- [[2026-11-22-k8s-viewing-pods-and-nodes]]: the tutorial module this page is based on.
+- [[kubernetes-service]], [[kubernetes-labels-and-selectors]]: how workloads are addressed and grouped.
+- [[2026-11-22-k8s-viewing-pods-and-nodes]], [[2026-11-22-k8s-using-a-service-to-expose-your-app]]: the tutorial modules this page is based on.

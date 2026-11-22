@@ -67,4 +67,4 @@ One Node (the hexagon) running the same four Pods. The strip along the Node's ed
 - How long after a Node fails are its Pods replaced, and what decides that? (Node heartbeats, eviction timeouts; see the Nodes concept doc linked from the page.)
 - The URL path `/api/v1/namespaces/default/...` shows Pods live inside a **namespace**. Namespaces are Kubernetes' basic tenancy boundary (general knowledge). A source on namespaces and ResourceQuota would open the tenancy-quotas domain on the Kubernetes side.
 - The source says a Node "may be either a virtual or a physical machine". How do GPU clouds bring bare-metal servers into a cluster as Nodes (provisioning, driver install, health gating)?
-- Next tutorial module: Services, i.e. how a stable address fronts Pods that come and go. Relevant to load balancing across inference replicas.
+- Next tutorial module: Services, i.e. how a stable address fronts Pods that come and go. Relevant to load balancing across inference replicas. (Ingested: [[2026-11-22-k8s-using-a-service-to-expose-your-app]].)

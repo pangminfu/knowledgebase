@@ -56,3 +56,9 @@ Append-only. Entry format: `## [YYYY-MM-DD] <ingest|query|lint|schema|init> | <t
 - [[gpu-performance-regimes]]: talking points removed; compute-outgrowing-bandwidth trend moved into Details
 - Reworded career framing: [[llm-inference]], [[control-plane]], [[kubernetes-node]], [[overview]] (Career coverage row removed), [[index]]
 - `career` tag removed from frontmatter of 29 pages; [[operator-fusion]] now has no tags
+
+## [2026-11-22] ingest | Using a Service to Expose Your App (Kubernetes Basics, Module 4)
+- Saved raw: raw/2026-11-22-k8s-using-a-service-to-expose-your-app.md; image raw/assets/k8s-expose-labels.svg
+- Created: [[2026-11-22-k8s-using-a-service-to-expose-your-app]], [[kubernetes-service]], [[kubernetes-labels-and-selectors]]
+- Updated: [[kubernetes]], [[kubernetes-pod]], [[kubernetes-node]], [[kubernetes-deployment]], [[kubectl]], [[inference-serving]], [[2026-11-22-k8s-viewing-pods-and-nodes]] (question cross-link), [[overview]], [[index]]
+- Emphasis (user): Service types, labels as a general primitive, inference-endpoint mapping, kubectl commands

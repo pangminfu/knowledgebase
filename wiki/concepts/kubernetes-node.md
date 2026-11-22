@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [lifecycle, provisioning, tenancy-quotas]
-sources: [2026-11-22-k8s-viewing-pods-and-nodes]
+sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app]
 created: 2026-11-22
 updated: 2026-11-22
 ---
@@ -24,6 +24,8 @@ One Node (hexagon) running four Pods of different sizes, each with its own IP. T
 - If a Node fails, its Pods are rescheduled as identical new Pods on other available Nodes. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - The control plane notices a failed Node because its kubelet stops sending heartbeats; after a timeout the Node is marked not ready and its Pods are evicted. (general knowledge)
 - `kubectl describe node <name>` shows a Node's capacity, what is allocated, and recent events ([[kubectl]]). (src for `describe` on Nodes: [[2026-11-22-k8s-viewing-pods-and-nodes]]; fields: general knowledge)
+- A **NodePort** [[kubernetes-service|Service]] opens the same port on each selected Node, so an app is reachable from outside at `NodeIP:NodePort`. In the tutorial, the Service's external IP is the Node's IP. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
+- Nodes carry [[kubernetes-labels-and-selectors|labels]] too; on GPU Nodes these describe the hardware (GPU model, memory) and steer Pods to the right SKU. (general knowledge)
 
 ## GPU cloud bridge
 
@@ -42,6 +44,7 @@ All general knowledge; not from the source.
 - [[control-plane]]: what manages Nodes.
 - [[kubernetes-scheduling]]: how Pods are placed on Nodes.
 - [[nvidia-smi]]: first-line GPU health check on a Node.
+- [[kubernetes-service]]: NodePort Services open a port on every Node.
 
 ## Open questions
 

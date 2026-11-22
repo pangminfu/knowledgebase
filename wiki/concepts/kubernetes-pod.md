@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [lifecycle, provisioning, metering-billing]
-sources: [2026-11-22-k8s-viewing-pods-and-nodes]
+sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app]
 created: 2026-11-22
 updated: 2026-11-22
 ---
@@ -24,6 +24,8 @@ Four Pods, each with its own IP (10.10.10.1–4). They range from one container 
 - **Lifecycle:** a Pod stays bound to the Node it was scheduled on until it terminates (per its restart policy) or is deleted. If the Node fails, identical Pods are scheduled on other Nodes. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]]) The replacements are new Pods with new names and IPs; a Pod itself never migrates. (general knowledge)
 - **Restart policy** decides what happens when a container in the Pod exits: restart it always, only on failure, or never. Services use "always"; batch jobs use "on failure" or "never". (general knowledge)
 - Pods live on a private cluster network, so reaching one from a laptop needs a proxy such as `kubectl proxy` ([[kubectl]]). (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
+- **Every Pod has its own IP, even Pods on the same Node, and replacement Pods get new ones.** Pod IPs are not reachable from outside the cluster. Clients therefore reach Pods through a [[kubernetes-service|Service]], which picks them by [[kubernetes-labels-and-selectors|label]]. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
+- Labels can be added to a running Pod at any time, e.g. `kubectl label pods $POD_NAME version=v1`. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
 
 ## GPU cloud bridge
 
@@ -42,6 +44,8 @@ All general knowledge; not from the source.
 - [[kubernetes-scheduling]]: how a Pod gets assigned to a Node.
 - [[container]]: what a Pod holds.
 - [[kubelet]]: the Node agent that actually starts a Pod's containers.
+- [[kubernetes-service]]: the stable address in front of Pods that come and go.
+- [[kubernetes-labels-and-selectors]]: the tags that decide which Service routes to a Pod.
 - [[inference-serving]]: the replicas a GPU cloud runs as Pods.
 
 ## Open questions

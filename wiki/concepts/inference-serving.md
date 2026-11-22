@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
-sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-22-training-vs-inference]
+sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-22-training-vs-inference, 2026-11-22-k8s-using-a-service-to-expose-your-app]
 created: 2026-11-21
 updated: 2026-11-22
 ---
@@ -18,7 +18,7 @@ API surface (HTTP/gRPC), request queuing and scheduling, batching across concurr
 
 A second handbook page defines model serving as the production process of making a trained model available to applications: packaging it, loading it onto suitable hardware, exposing it through an API, monitoring it, and keeping **latency, reliability, security, and cost** under control. This adds packaging and security to the list above. (src: [[2026-11-22-training-vs-inference]])
 
-A **replica** is one running copy of the model on its own GPU(s). Serving at scale means many replicas behind a load balancer. (general knowledge) On Kubernetes, a replica is typically one [[kubernetes-pod|Pod]], and a dedicated endpoint is a [[kubernetes-deployment|Deployment]] of such Pods. (general knowledge)
+A **replica** is one running copy of the model on its own GPU(s). Serving at scale means many replicas behind a load balancer. (general knowledge) On Kubernetes, a replica is typically one [[kubernetes-pod|Pod]], a dedicated endpoint is a [[kubernetes-deployment|Deployment]] of such Pods, and the endpoint's stable address is a [[kubernetes-service|Service]]. (general knowledge) A Service is Kubernetes' built-in way to load-balance across interchangeable replicas and give clients one address while replicas are lost and recreated. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]]) It balances per connection, which ignores request length and cache contents, so LLM platforms add request-level routing on top. (general knowledge)
 
 ### Mapped to the four control-plane domains
 
@@ -31,7 +31,7 @@ The handbook gives the list; the mapping below is this wiki's (general knowledge
 | Model loading and version management | Lifecycle | Platform orchestrates, framework loads | Where weights are stored, cold-start time, rolling upgrades between model versions |
 | Health checks | Lifecycle | Both | Restarting failed replicas, draining bad GPUs/nodes ([[nvidia-smi]]) |
 | Autoscaling | Lifecycle; metering-billing | Platform | Scale on which signal (queue depth, tokens/sec, latency), min/max replicas, who pays for idle replicas |
-| Load balancing across replicas | Provisioning; lifecycle | Platform | Routing policy. Cache-aware routing matters once replicas hold different prefixes ([[inference-optimization]]) |
+| Load balancing across replicas | Provisioning; lifecycle | Platform | Routing policy. A Kubernetes [[kubernetes-service|Service]] gives basic per-connection balancing; cache-aware routing matters once replicas hold different prefixes ([[inference-optimization]]) |
 | Request queuing and scheduling | Tenancy-quotas | Both: framework schedules within a replica, platform queues across tenants | Per-tenant rate limits, priority, fairness, what happens when a queue is full |
 | Batching across concurrent requests | Tenancy-quotas; metering-billing | Framework | Tenants share a batch, so isolation and per-tenant accounting are required ([[inference-batching]]) |
 | Observability | Metering-billing; lifecycle | Both | Per-tenant token counts for billing, latency/throughput SLOs, GPU metrics ([[gpu-utilization-metrics]]) |
@@ -51,6 +51,7 @@ The handbook gives the list; the mapping below is this wiki's (general knowledge
 - [[2026-11-12-sizing-a-gpu-inference-deployment]]: sizing arithmetic for the "resource allocation" row.
 - [[training-vs-inference]]: serving is the "operate" half of the model lifecycle, and the always-on workload the control plane runs.
 - [[kubernetes-pod]]: how a replica is packaged and placed on a GPU Node.
+- [[kubernetes-service]]: the stable address and basic load balancer in front of replica Pods.
 - [[control-plane]]: the platform side of the framework/platform split, defined.
 
 ## Open questions

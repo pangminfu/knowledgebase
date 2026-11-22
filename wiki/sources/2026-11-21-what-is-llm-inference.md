@@ -1,12 +1,12 @@
 ---
 type: source
-tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, career]
+tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
 sources: []
 raw: raw/2026-11-21-what-is-llm-inference.md
 url: https://handbook.modular.com/llm-inference-basics/what-is-llm-inference/
 author: Modular (LLM Inference Handbook)
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 ---
 
 # What is LLM inference? (LLM Inference Handbook)
@@ -17,7 +17,7 @@ Raw: [[raw/2026-11-21-what-is-llm-inference]] · Modular, *LLM Inference Handboo
 
 This is the opening chapter of a vendor-written handbook (Modular makes the MAX framework), and it is mostly vocabulary. It defines [[llm-inference]] as using a trained model to turn a prompt into output, and an inference server as the runtime that loads models onto GPUs and handles requests ([[inference-frameworks]]). Its most useful point is the split between **inference** (the computation, a forward pass) and **serving** (everything that turns that computation into a production service: API, queuing, batching, load balancing, autoscaling, model versioning, health checks, observability, resource allocation). See [[inference-serving]]. It then lists the standard [[inference-optimization]] techniques and argues that teams eventually outgrow per-token serverless APIs and move to hybrid or self-hosted serving ([[per-token-pricing]]).
 
-**Why a control-plane engineer should care:** the "serving" list on this page is close to a job description for a GPU cloud's inference control plane. Each item maps to one of the four target domains (mapping in [[inference-serving]]). (general knowledge)
+**Why a control-plane engineer should care:** the "serving" list on this page is close to the responsibility list of a GPU cloud's inference control plane. Each item maps to one of the four target domains (mapping in [[inference-serving]]). (general knowledge)
 
 There are no images. The page has an interactive visualizer of one request's path: **Tokenizer → Scheduling → Prefill → Output** (streamed). (src: [[2026-11-21-what-is-llm-inference]])
 
@@ -47,11 +47,11 @@ There are no images. The page has an interactive visualizer of one request's pat
 - As usage grows, teams hit limits on cost, latency, customization, or compliance that serverless APIs cannot fully address, and they move to hybrid or self-hosted setups. (src: [[2026-11-21-what-is-llm-inference]])
 - Claim: a poorly optimized setup "can cost 10× more in GPU hours while delivering worse performance." The page gives no measurement behind this. Treat it as an illustrative order of magnitude, not data. (src: [[2026-11-21-what-is-llm-inference]])
 
-## Interview talking points
+## Takeaways
 
-- **"What's the difference between inference and serving?"** Inference is the forward pass that turns tokens into next-token probabilities. Serving is the system that makes it a reliable service: API, queue, scheduler, batching, replicas, autoscaling, model versions, health, metrics. A control plane owns most of the serving list. (src: [[2026-11-21-what-is-llm-inference]]; control-plane framing: general knowledge)
-- Name the request path (tokenize → schedule → prefill → decode/stream) and say where the GPU-bound work happens (prefill and decode). (src: [[2026-11-21-what-is-llm-inference]], [[2026-11-12-transformer-inference-arithmetic]])
-- Explain why per-token prices and GPU-hour prices are different products: the provider's margin depends on batching efficiency. See [[per-token-pricing]].
+- Inference is the forward pass that turns tokens into next-token probabilities. Serving is the system that makes it a reliable service: API, queue, scheduler, batching, replicas, autoscaling, model versions, health, metrics. A control plane owns most of the serving list. (src: [[2026-11-21-what-is-llm-inference]]; control-plane framing: general knowledge)
+- A request's path is tokenize → schedule → prefill → decode/stream. The GPU-bound work is prefill and decode. (src: [[2026-11-21-what-is-llm-inference]], [[2026-11-12-transformer-inference-arithmetic]])
+- Per-token prices and GPU-hour prices are different products: the provider's margin on per-token pricing depends on batching efficiency. See [[per-token-pricing]].
 
 ## Concepts & entities touched
 

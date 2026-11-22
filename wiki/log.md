@@ -49,3 +49,10 @@ Append-only. Entry format: `## [YYYY-MM-DD] <ingest|query|lint|schema|init> | <t
 - Emphasis (user): bridge to GPU cloud (marked general knowledge), beginner definitions and analogies, kubectl cheat sheet as its own page
 - Created: [[2026-11-22-k8s-viewing-pods-and-nodes]], [[kubernetes-pod]], [[kubernetes-node]], [[kubernetes-deployment]], [[kubernetes-scheduling]], [[control-plane]], [[container]], [[kubernetes]], [[kubelet]], [[containerd]], [[kubectl]]
 - Updated: [[inference-serving]], [[inference-frameworks]], [[model-parallelism]], [[training-vs-inference]], [[nvidia-smi]], [[overview]], [[index]]
+
+## [2026-11-22] schema | Lifelong knowledge base; drop interview/career content
+- AGENTS.md: subject/goal reframed from career switch to a lifelong knowledge base; `career` tag removed; new style rule "Knowledge, not exam prep"; source template gains optional `## Takeaways`
+- Replaced "Interview talking points" with declarative "Takeaways": [[2026-11-10-deep-learning-brrrr-first-principles]], [[2026-11-12-transformer-inference-arithmetic]], [[2026-11-21-what-is-llm-inference]], [[2026-11-22-k8s-viewing-pods-and-nodes]], [[2026-11-22-training-vs-inference]]
+- [[gpu-performance-regimes]]: talking points removed; compute-outgrowing-bandwidth trend moved into Details
+- Reworded career framing: [[llm-inference]], [[control-plane]], [[kubernetes-node]], [[overview]] (Career coverage row removed), [[index]]
+- `career` tag removed from frontmatter of 29 pages; [[operator-fusion]] now has no tags

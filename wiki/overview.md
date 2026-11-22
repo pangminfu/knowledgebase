@@ -1,6 +1,6 @@
 ---
 type: overview
-tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, career]
+tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
 sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference, 2026-11-22-k8s-viewing-pods-and-nodes]
 created: 2026-11-10
 updated: 2026-11-22
@@ -51,7 +51,7 @@ flowchart TB
 
 Control-plane consequences (general knowledge unless cited):
 
-- **The serving list is the job description.** Each serving responsibility maps to one of the four domains; the mapping table is in [[inference-serving]].
+- **The serving list is the control plane's scope.** Each serving responsibility maps to one of the four domains; the mapping table is in [[inference-serving]].
 - **Two products, two meters.** Serverless APIs bill per token and carry the utilization risk; self-hosted customers rent GPU-hours and carry it themselves (src for per-token serverless: [[2026-11-21-what-is-llm-inference]]). See [[per-token-pricing]].
 - **Optimizations move capacity.** Continuous batching, quantization, and prefix caching raise tokens per GPU, so GPU-denominated quotas and token-denominated prices drift apart. See [[inference-optimization]] for the reading roadmap.
 
@@ -82,7 +82,6 @@ Control-plane consequences (general knowledge):
 | Tenancy and quotas | Concurrency-as-memory from inference arithmetic; serving-side queuing/rate limits and training capacity blocks identified but unsourced |
 | Kubernetes and bare-metal lifecycle | Kubernetes basics sourced (Pods, Nodes, kubelet, runtime, scheduling by free resources, replacement on Node failure, kubectl triage); GPU device plugins, gang scheduling, Node health/drain, and bare-metal provisioning still unsourced |
 | Metering and billing | Utilization metrics, tokens-vs-GPU-hours reasoning, per-token vs GPU-hour products, inference as the recurring cost; no billing-pipeline sources |
-| Career | Interview talking points on GPU performance, capacity, batching, parallelism, inference vs serving, training vs inference, and Kubernetes Pods/Nodes ("what happens when a Node dies?") |
 
 ## Suggested next sources
 

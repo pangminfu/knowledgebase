@@ -1,6 +1,6 @@
 ---
 type: concept
-tags: [lifecycle, provisioning, career]
+tags: [lifecycle, provisioning]
 sources: [2026-11-22-training-vs-inference]
 created: 2026-11-22
 updated: 2026-11-22

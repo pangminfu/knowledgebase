@@ -1,6 +1,6 @@
 ---
 type: concept
-tags: [provisioning, lifecycle, career]
+tags: [provisioning, lifecycle]
 sources: [2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-12
 updated: 2026-11-22

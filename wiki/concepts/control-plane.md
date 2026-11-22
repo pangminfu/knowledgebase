@@ -1,6 +1,6 @@
 ---
 type: concept
-tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, career]
+tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
 sources: [2026-11-22-k8s-viewing-pods-and-nodes]
 created: 2026-11-22
 updated: 2026-11-22
@@ -8,7 +8,7 @@ updated: 2026-11-22
 
 # Control plane
 
-The **control plane** is the part of a system that *decides and manages*; the **data plane** is the part that *does the actual work*. In a restaurant, the manager taking reservations, assigning tables, and keeping the books is the control plane; the kitchen cooking food is the data plane. The term is used at two levels in this wiki, and interviews will use both. (general knowledge)
+The **control plane** is the part of a system that *decides and manages*; the **data plane** is the part that *does the actual work*. In a restaurant, the manager taking reservations, assigning tables, and keeping the books is the control plane; the kitchen cooking food is the data plane. The term is used at two levels in this wiki, and real systems use both. (general knowledge)
 
 ## Details
 
@@ -23,7 +23,7 @@ The **control plane** is the part of a system that *decides and manages*; the **
   - **Controller manager:** runs controllers (e.g. for [[kubernetes-deployment|Deployments]]) that keep comparing desired state to actual state and fixing the difference. This loop is called **reconciliation**.
 - The Nodes, kubelets, and containers doing the work are the data plane. (general knowledge)
 
-### Level 2: a GPU cloud's control plane (the job)
+### Level 2: a GPU cloud's control plane
 
 - A GPU cloud's control plane is the software that turns hardware into a product: APIs to create clusters, instances, or endpoints; accounts, tenants, and quotas; the lifecycle of machines and workloads; and metering usage into bills. These are this wiki's four domains. The data plane is the GPUs, servers, network, and the customer workloads running on them. (general knowledge)
 - It usually *contains* Kubernetes rather than replacing it: the cloud's API receives "create an 8-GPU endpoint for tenant A", checks A's quota, then creates Kubernetes objects (namespaces, Deployments, Pods) on GPU Nodes, and meters what runs. (general knowledge)

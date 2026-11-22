@@ -1,9 +1,9 @@
 ---
 type: synthesis
-tags: [provisioning, tenancy-quotas, metering-billing, career]
+tags: [provisioning, tenancy-quotas, metering-billing]
 sources: [2026-11-12-transformer-inference-arithmetic, 2026-11-10-deep-learning-brrrr-first-principles]
 created: 2026-11-12
-updated: 2026-11-12
+updated: 2026-11-22
 ---
 
 # Sizing a GPU inference deployment

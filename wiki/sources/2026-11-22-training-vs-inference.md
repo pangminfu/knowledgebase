@@ -1,6 +1,6 @@
 ---
 type: source
-tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, career]
+tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
 sources: []
 raw: raw/2026-11-22-training-vs-inference.md
 url: https://handbook.modular.com/llm-inference-basics/training-inference-differences/
@@ -57,11 +57,11 @@ There are no images. The page has an interactive "LLM Lifecycle Visualizer" with
 - **Should you train your own LLM?** Usually not. Training from scratch needs massive datasets, specialized hardware, and a research team. Most companies get better results by fine-tuning an existing open-source model. Full training makes sense only when existing models cannot handle the problem, or when control requirements cannot be met by fine-tuning. (src: [[2026-11-22-training-vs-inference]])
 - **Fine-tuning is training.** It updates some of the model's weights using new data. Inference never changes weights. (src: [[2026-11-22-training-vs-inference]])
 
-## Interview talking points
+## Takeaways
 
-- **"How do training and inference workloads differ for a cloud?"** Training is a scheduled batch job: many GPUs, all at once, for days, paid for as reserved GPU-hours. Inference is a service: replicas that scale with traffic, judged on latency, and billed per token or per endpoint-hour. Then name one consequence for each domain (table in [[training-vs-inference]]). (src for the contrast: [[2026-11-22-training-vs-inference]]; cloud framing: general knowledge)
-- **"Why is inference the growing share of GPU demand?"** Training cost is paid once. Inference cost scales with every user and every token, and it never stops while the product is live. (src: [[2026-11-22-training-vs-inference]])
-- Know that fine-tuning is training-shaped work, and that its output is a model artifact that the inference side then has to deploy ([[fine-tuning]]). (src: [[2026-11-22-training-vs-inference]]; artifact handoff: general knowledge)
+- For a cloud, training is a scheduled batch job: many GPUs, all at once, for days, paid for as reserved GPU-hours. Inference is a service: replicas that scale with traffic, judged on latency, and billed per token or per endpoint-hour. Each domain handles the two differently (table in [[training-vs-inference]]). (src for the contrast: [[2026-11-22-training-vs-inference]]; cloud framing: general knowledge)
+- Inference's share of GPU demand grows because training cost is paid once, while inference cost scales with every user and every token and never stops while the product is live. (src: [[2026-11-22-training-vs-inference]])
+- Fine-tuning is training-shaped work, and its output is a model artifact that the inference side then has to deploy ([[fine-tuning]]). (src: [[2026-11-22-training-vs-inference]]; artifact handoff: general knowledge)
 
 ## Concepts & entities touched
 

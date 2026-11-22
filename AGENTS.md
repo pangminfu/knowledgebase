@@ -6,9 +6,10 @@ The user browses the result in Obsidian (this repo root is the vault).
 
 ## Topic
 
-- **Subject:** How to career-switch into GPU cloud control plane engineering.
-- **Goal:** Build working knowledge of the control plane domains below, enough to
-  interview for and do the job:
+- **Subject:** GPU cloud control plane engineering.
+- **Goal:** Build a lifelong personal knowledge base: durable, working understanding of
+  how GPU clouds are built and run, starting from these control plane domains and
+  growing beyond them as interests expand:
   1. Provisioning APIs
   2. Tenancy and quotas
   3. Kubernetes and bare-metal lifecycle
@@ -18,7 +19,7 @@ The user browses the result in Obsidian (this repo root is the vault).
 - **Ingest style:** Supervised. Always discuss takeaways before writing pages.
 
 Tag pages with the domain(s) they serve: `provisioning`, `tenancy-quotas`,
-`lifecycle`, `metering-billing`, plus `career` for job-market/interview material.
+`lifecycle`, `metering-billing`.
 
 If any field above is `(not set)`, ask the user for it at the start of the session
 and fill it in here before doing anything else.
@@ -75,6 +76,9 @@ wiki/syntheses/      Filed answers to queries: comparisons, analyses, explanatio
   Source pages additionally carry `raw: raw/<file>` and `url:` / `author:` when known.
 - **Style:** concise, factual, skimmable. Explain things at the user's current level
   (see Topic). Prefer short sections, bullet lists, and tables over long prose.
+- **Knowledge, not exam prep:** write what is true, why, and how it connects. No
+  interview questions, "talking points", "be able to explain…" phrasing, or
+  job-market/career framing.
 
 ## Page templates
 
@@ -83,6 +87,7 @@ wiki/syntheses/      Filed answers to queries: comparisons, analyses, explanatio
 # <Title>
 ## Summary          — 3–6 sentences
 ## Key points       — bullets, each specific and checkable
+## Takeaways        — optional: the few ideas worth keeping long-term, as plain statements
 ## Concepts & entities touched — wikilinks
 ## Questions raised — open questions worth following up
 ```

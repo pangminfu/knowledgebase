@@ -1,6 +1,6 @@
 ---
 type: concept
-tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, career]
+tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
 sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-22-training-vs-inference]
 created: 2026-11-21
 updated: 2026-11-22

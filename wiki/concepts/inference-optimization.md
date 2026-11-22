@@ -1,9 +1,9 @@
 ---
 type: concept
-tags: [provisioning, tenancy-quotas, metering-billing, career]
+tags: [provisioning, tenancy-quotas, metering-billing]
 sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-10-deep-learning-brrrr-first-principles]
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 ---
 
 # Inference optimization

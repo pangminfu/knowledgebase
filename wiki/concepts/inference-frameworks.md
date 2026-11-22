@@ -1,6 +1,6 @@
 ---
 type: concept
-tags: [provisioning, lifecycle, career]
+tags: [provisioning, lifecycle]
 sources: [2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference]
 created: 2026-11-21
 updated: 2026-11-22

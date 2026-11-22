@@ -1,9 +1,9 @@
 ---
 type: concept
-tags: [provisioning, metering-billing, career]
+tags: [provisioning, metering-billing]
 sources: [2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-12
-updated: 2026-11-12
+updated: 2026-11-22
 ---
 
 # Inference latency model

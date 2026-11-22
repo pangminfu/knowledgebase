@@ -1,6 +1,6 @@
 ---
 type: concept
-tags: [metering-billing, tenancy-quotas, career]
+tags: [metering-billing, tenancy-quotas]
 sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-10-deep-learning-brrrr-first-principles, 2026-11-22-training-vs-inference]
 created: 2026-11-21
 updated: 2026-11-22

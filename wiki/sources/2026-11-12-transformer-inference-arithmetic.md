@@ -1,12 +1,12 @@
 ---
 type: source
-tags: [provisioning, tenancy-quotas, metering-billing, career]
+tags: [provisioning, tenancy-quotas, metering-billing]
 sources: []
 raw: raw/2026-11-12-transformer-inference-arithmetic.md
 url: https://kipp.ly/p/transformer-inference-arithmetic
 author: Carol Chen (kipply)
 created: 2026-11-12
-updated: 2026-11-12
+updated: 2026-11-22
 ---
 
 # Transformer Inference Arithmetic
@@ -93,11 +93,11 @@ Three consequences of batch size, left to right: memory is mostly weights at sma
 
 (src: [[2026-11-12-transformer-inference-arithmetic]])
 
-## Interview talking points
+## Takeaways
 
-- Derive the 208 flops/byte threshold from any SKU's spec sheet (peak TFLOPS ÷ bandwidth per second); then say what it means for batch size. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- Explain why a 52B fp16 model cannot run on one 40 GB GPU, and what the leftover memory buys. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- Explain why adding GPUs does not keep lowering latency (comms floor), and why pipeline parallelism is not the answer for single requests. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Any SKU's flops-per-byte threshold is peak FLOPS ÷ memory bandwidth (208 for an A100). It is the number of tokens in flight at which serving stops being memory-bound and becomes compute-bound, so it sets the useful batch size. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- A 52B fp16 model (104 GB) cannot run on one 40 GB GPU. Whatever memory the weights leave free becomes kv cache, which caps how many tokens can be in flight. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Adding GPUs stops lowering latency because the communication floor does not shrink, and pipeline parallelism does not speed up a single request because only one GPU works on it at a time. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ## Concepts & entities touched
 

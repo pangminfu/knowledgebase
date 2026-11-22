@@ -1,9 +1,9 @@
 ---
 type: concept
-tags: [career, metering-billing]
+tags: [metering-billing]
 sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-10
-updated: 2026-11-12
+updated: 2026-11-22
 ---
 
 # GPU performance regimes
@@ -29,6 +29,7 @@ A factory twice the size, still fed by the same conveyor belts. Output can't dou
 
 - Large models usually mix compute-bound and memory-bound parts, so the regime is a matter of degree. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - Caveat: a bigger batch can also raise *compute intensity* (math per byte), e.g. a [B, D]×[D, D] matmul with B < D. So the batch-size test isn't purely about overhead. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
+- Compute grows faster than memory bandwidth across hardware generations, so memory-bound behaviour becomes more common over time. See [[memory-bandwidth]]. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 
 ## Inference is memory-bound by default
 
@@ -42,11 +43,6 @@ Generation has no batch to hide behind: each new token requires reading every we
 - A customer's GPU can look fully busy while doing a small fraction of its peak math. Utilization dashboards and billing need to say clearly what they measure. See [[gpu-utilization-metrics]]. (general knowledge)
 - When a customer reports "slow GPUs", triage starts by separating a workload in the wrong regime (the customer's problem) from a hardware or host fault (the provider's problem). (general knowledge)
 - An overhead-bound customer on a top-tier GPU is overpaying; a smaller SKU might perform the same. This matters for right-sizing advice and capacity planning. (general knowledge)
-
-## Interview talking points
-
-- Name the three regimes, a test for each, and a fix for each (table above).
-- Explain why the industry trend (compute outgrowing bandwidth) makes memory-bound behaviour more common over time. See [[memory-bandwidth]].
 
 ## Related
 

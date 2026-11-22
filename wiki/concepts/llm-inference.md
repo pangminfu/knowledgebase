@@ -1,6 +1,6 @@
 ---
 type: concept
-tags: [provisioning, metering-billing, career]
+tags: [provisioning, metering-billing]
 sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-22-training-vs-inference]
 created: 2026-11-21
 updated: 2026-11-22
@@ -36,7 +36,7 @@ flowchart LR
 - Prefill and decode are the GPU work. Prefill reads the whole prompt in parallel. Decode generates one token at a time, reusing the [[kv-cache]]. See [[prefill-and-decode]]. (src: [[2026-11-12-transformer-inference-arithmetic]], [[2026-11-21-what-is-llm-inference]])
 - Each generated token costs about 2 [[flops]] per model parameter. With a small batch, the step time is set by reading all the weights from memory rather than by compute ([[gpu-performance-regimes]]). (src: [[2026-11-12-transformer-inference-arithmetic]])
 
-### Inference vs serving: the interview answer
+### Inference vs serving
 
 | | Inference | Serving |
 | --- | --- | --- |

@@ -1,9 +1,9 @@
 ---
 type: concept
-tags: [career, metering-billing]
+tags: [metering-billing]
 sources: [2026-11-10-deep-learning-brrrr-first-principles]
 created: 2026-11-10
-updated: 2026-11-10
+updated: 2026-11-22
 ---
 
 # Framework overhead

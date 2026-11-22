@@ -1,9 +1,9 @@
 ---
 type: concept
-tags: [provisioning, tenancy-quotas, metering-billing, career]
+tags: [provisioning, tenancy-quotas, metering-billing]
 sources: [2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-12
-updated: 2026-11-12
+updated: 2026-11-22
 ---
 
 # GPU memory capacity

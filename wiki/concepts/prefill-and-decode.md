@@ -1,9 +1,9 @@
 ---
 type: concept
-tags: [provisioning, metering-billing, career]
+tags: [provisioning, metering-billing]
 sources: [2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference]
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-22
 ---
 
 # Prefill and decode

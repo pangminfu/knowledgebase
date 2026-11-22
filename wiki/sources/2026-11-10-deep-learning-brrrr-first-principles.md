@@ -1,12 +1,12 @@
 ---
 type: source
-tags: [metering-billing, provisioning, career]
+tags: [metering-billing, provisioning]
 sources: []
 raw: raw/2026-11-10-making-deep-learning-go-brrrr.md
 url: https://horace.io/brrr_intro.html
 author: Horace He
 created: 2026-11-10
-updated: 2026-11-10
+updated: 2026-11-22
 ---
 
 # Making Deep Learning Go Brrrr From First Principles
@@ -43,11 +43,11 @@ The author's central analogy: memory is a warehouse, compute is a factory, and c
 | Bandwidth-bound | Operator fusion |
 | Compute-bound | Use Tensor Cores, buy more/faster GPUs |
 
-## Interview talking points
+## Takeaways
 
-- Be able to explain, with numbers, why "100% GPU-Util" ≠ "using the GPU well". Util measures *time busy*, not *how much of the hardware* is busy. (src + general knowledge)
-- Explain the three regimes and how to tell them apart (FLOPS % of peak, batch-size scaling, profiler gaps). Customers' ML engineers think in these terms.
-- Know that spec-sheet TFLOPS depend on precision, Tensor Core use, and (marked `*` on the A100 sheet) sparsity. So never compare SKUs on headline TFLOPS alone. (sparsity: general knowledge)
+- "100% GPU-Util" does not mean the GPU is used well. Util measures *time busy*, not *how much of the hardware* is busy. (src + general knowledge)
+- The three regimes are told apart by achieved FLOPS as a share of peak, by how runtime scales with batch size, and by gaps in a profiler trace. Customers' ML engineers think in these terms.
+- Spec-sheet TFLOPS depend on precision, Tensor Core use, and (marked `*` on the A100 sheet) sparsity, so headline TFLOPS alone is not a fair way to compare SKUs. (sparsity: general knowledge)
 
 ## Concepts & entities touched
 

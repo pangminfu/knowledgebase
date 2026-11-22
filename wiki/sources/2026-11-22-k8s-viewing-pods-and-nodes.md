@@ -1,6 +1,6 @@
 ---
 type: source
-tags: [lifecycle, provisioning, career]
+tags: [lifecycle, provisioning]
 sources: []
 raw: raw/2026-11-22-k8s-viewing-pods-and-nodes.md
 url: https://kubernetes.io/docs/tutorials/kubernetes-basics/explore/explore-intro/
@@ -51,11 +51,11 @@ One Node (the hexagon) running the same four Pods. The strip along the Node's ed
 - With one container in a Pod, `exec` and `logs` need no container name. `kubectl exec -ti <pod> -- bash` opens a shell inside the container. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - Full command reference: [[kubectl]].
 
-## Interview talking points
+## Takeaways
 
-- **"What's a Pod and why not just a container?"** A Pod is the scheduling unit: a small group of containers that must share a machine, an IP, and disk. Kubernetes places, restarts, and replaces Pods, never bare containers. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
-- **"What happens when a Node dies?"** Its Pods are not moved; they are lost. The controller that owns them, such as a Deployment, creates identical replacement Pods, and the scheduler places them on healthy Nodes. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]]; "not moved, replaced" framing: general knowledge) For a GPU inference replica, that means a cold start while the replacement reloads model weights. (general knowledge)
-- **"What runs on every Node?"** kubelet plus a container runtime. On GPU Nodes, add the NVIDIA driver, the NVIDIA container toolkit, and the GPU device plugin, so that Pods can request GPUs. (first two: src; GPU add-ons: general knowledge)
+- The Pod, not the container, is the scheduling unit: a small group of containers that must share a machine, an IP, and disk. Kubernetes places, restarts, and replaces Pods, never bare containers. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
+- When a Node dies, its Pods are not moved; they are lost. The controller that owns them, such as a Deployment, creates identical replacement Pods, and the scheduler places them on healthy Nodes. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]]; "not moved, replaced" framing: general knowledge) For a GPU inference replica, that means a cold start while the replacement reloads model weights. (general knowledge)
+- Every Node runs kubelet plus a container runtime. GPU Nodes add the NVIDIA driver, the NVIDIA container toolkit, and the GPU device plugin, so that Pods can request GPUs. (first two: src; GPU add-ons: general knowledge)
 
 ## Concepts & entities touched
 

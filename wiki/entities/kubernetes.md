@@ -1,6 +1,6 @@
 ---
 type: entity
-tags: [lifecycle, provisioning, tenancy-quotas, career]
+tags: [lifecycle, provisioning, tenancy-quotas]
 sources: [2026-11-22-k8s-viewing-pods-and-nodes]
 created: 2026-11-22
 updated: 2026-11-22

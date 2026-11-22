@@ -12,6 +12,7 @@ Catalog of every page in the wiki. One line per page: link — summary.
 - [[2026-11-12-transformer-inference-arithmetic]] — kipply (2022): closed-form LLM serving math — kv cache size, 208 flops/byte, capacity → batch size, tensor-parallel comms floor; validated against FasterTransformer
 - [[2026-11-21-what-is-llm-inference]] — Modular LLM Inference Handbook intro: inference vs serving, inference servers/frameworks, optimization techniques list, serverless per-token vs self-hosted
 - [[2026-11-22-training-vs-inference]] — Modular handbook: training (build, mostly one-time, multi-node, hours–weeks) vs inference (operate, ongoing, ms–s, scales with traffic); comparison table; fine-tuning is training
+- [[2026-11-22-k8s-viewing-pods-and-nodes]] — Kubernetes Basics Module 3: Pods (shared IP/volumes, atomic unit), Nodes (VM or physical; kubelet + containerd), scheduling by free resources, kubectl get/describe/logs/exec/proxy
 
 ## Concepts
 
@@ -34,11 +35,21 @@ Catalog of every page in the wiki. One line per page: link — summary.
 - [[per-token-pricing]] — per-token vs GPU-hour products; why token cost depends on batching; what each metering pipeline must capture
 - [[training-vs-inference]] — the build vs operate lifecycle; comparison table; how each workload differs for provisioning, quotas, lifecycle, and billing
 - [[fine-tuning]] — adapting an existing model by updating some weights; training-shaped job whose output the serving side deploys
+- [[control-plane]] — control plane vs data plane at two levels: Kubernetes' own (API server, scheduler, controllers) and the GPU cloud's (the four domains)
+- [[kubernetes-pod]] — smallest unit Kubernetes runs: containers sharing IP and volumes on one Node; replaced not moved; an inference replica = a Pod requesting GPUs
+- [[kubernetes-node]] — a worker machine (VM or bare metal) running Pods, kubelet, and a runtime; GPU Node software and bare-metal lifecycle (cordon/drain)
+- [[kubernetes-deployment]] — keeps N identical Pods running and replaces lost ones; rolling updates; maps to a dedicated inference endpoint
+- [[kubernetes-scheduling]] — placing Pods on Nodes by resource requests; GPUs as whole extended resources; Pending, fragmentation, gang scheduling, quotas in front
+- [[container]] — packaged app as an isolated process; image vs container vs registry; Docker vs containerd; GPU images and cold start
 
 ## Entities
 
 - [[nvidia-a100]] — Ampere datacenter GPU; spec table, SKU variants (PCIe/SXM, 40/80 GB), NVLink 300 GB/s
 - [[nvidia-smi]] — NVIDIA's GPU status CLI; DRAM usage, GPU-Util, health triage
+- [[kubernetes]] — container orchestration system; core objects, declarative desired state, namespaces; what it means for each control-plane domain
+- [[kubelet]] — per-Node agent that runs Pods for the control plane; heartbeats, probes, GPU device-plugin registration
+- [[containerd]] — the container runtime that pulls and runs images on each Node; replaced Docker in Kubernetes; GPU access via NVIDIA toolkit
+- [[kubectl]] — Kubernetes CLI cheat sheet: get/describe/logs/exec/proxy from the tutorial plus GPU-node triage commands
 
 ## Syntheses
 

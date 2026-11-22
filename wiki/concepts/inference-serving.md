@@ -18,7 +18,7 @@ API surface (HTTP/gRPC), request queuing and scheduling, batching across concurr
 
 A second handbook page defines model serving as the production process of making a trained model available to applications: packaging it, loading it onto suitable hardware, exposing it through an API, monitoring it, and keeping **latency, reliability, security, and cost** under control. This adds packaging and security to the list above. (src: [[2026-11-22-training-vs-inference]])
 
-A **replica** is one running copy of the model on its own GPU(s). Serving at scale means many replicas behind a load balancer. (general knowledge)
+A **replica** is one running copy of the model on its own GPU(s). Serving at scale means many replicas behind a load balancer. (general knowledge) On Kubernetes, a replica is typically one [[kubernetes-pod|Pod]], and a dedicated endpoint is a [[kubernetes-deployment|Deployment]] of such Pods. (general knowledge)
 
 ### Mapped to the four control-plane domains
 
@@ -50,6 +50,8 @@ The handbook gives the list; the mapping below is this wiki's (general knowledge
 - [[per-token-pricing]]: how serving is billed.
 - [[2026-11-12-sizing-a-gpu-inference-deployment]]: sizing arithmetic for the "resource allocation" row.
 - [[training-vs-inference]]: serving is the "operate" half of the model lifecycle, and the always-on workload the control plane runs.
+- [[kubernetes-pod]]: how a replica is packaged and placed on a GPU Node.
+- [[control-plane]]: the platform side of the framework/platform split, defined.
 
 ## Open questions
 

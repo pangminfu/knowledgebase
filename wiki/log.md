@@ -43,3 +43,9 @@ Append-only. Entry format: `## [YYYY-MM-DD] <ingest|query|lint|schema|init> | <t
 - Emphasis (user): control-plane implications of training vs inference workloads; fine-tuning as a separate stub page
 - Created: [[2026-11-22-training-vs-inference]], [[training-vs-inference]], [[fine-tuning]]
 - Updated: [[llm-inference]], [[inference-serving]], [[inference-frameworks]] (added LMDeploy), [[per-token-pricing]], [[overview]], [[index]]
+
+## [2026-11-22] ingest | Viewing Pods and Nodes (Kubernetes Basics, Module 3)
+- Saved raw: `raw/2026-11-22-k8s-viewing-pods-and-nodes.md`; 2 diagrams as `raw/assets/k8s-explore-pods.svg`, `raw/assets/k8s-explore-nodes.svg`
+- Emphasis (user): bridge to GPU cloud (marked general knowledge), beginner definitions and analogies, kubectl cheat sheet as its own page
+- Created: [[2026-11-22-k8s-viewing-pods-and-nodes]], [[kubernetes-pod]], [[kubernetes-node]], [[kubernetes-deployment]], [[kubernetes-scheduling]], [[control-plane]], [[container]], [[kubernetes]], [[kubelet]], [[containerd]], [[kubectl]]
+- Updated: [[inference-serving]], [[inference-frameworks]], [[model-parallelism]], [[training-vs-inference]], [[nvidia-smi]], [[overview]], [[index]]

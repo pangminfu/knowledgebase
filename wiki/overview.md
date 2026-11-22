@@ -1,7 +1,7 @@
 ---
 type: overview
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, career]
-sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference]
+sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference, 2026-11-22-k8s-viewing-pods-and-nodes]
 created: 2026-11-10
 updated: 2026-11-22
 ---
@@ -64,22 +64,32 @@ Control-plane consequences (general knowledge):
 - **Two job shapes.** Training is an all-or-nothing batch job: a gang-scheduled cluster, checkpoints, and reserved GPU-hours. Inference is an always-on service: autoscaled replicas, rolling upgrades, and per-token or endpoint billing. Every domain needs a version of each; the per-domain table is in [[training-vs-inference]].
 - **The handoff is a model artifact.** Training or fine-tuning writes weights, and serving loads them. Storage, versioning, and cold start sit at that seam.
 
+## Where workloads run: Kubernetes Pods and Nodes
+
+The fifth source starts the lifecycle domain. In [[kubernetes]], a [[kubernetes-node|Node]] is a worker machine, virtual or physical, and a [[kubernetes-pod|Pod]] is the smallest unit it runs: one or more [[container|containers]] sharing an IP and storage, always on one Node. The [[control-plane]] schedules Pods onto Nodes by free resources ([[kubernetes-scheduling]]). Each Node runs a [[kubelet]] and a container runtime ([[containerd]]). When a Node fails, its Pods are not moved: identical replacements are scheduled elsewhere. A [[kubernetes-deployment|Deployment]] creates the Pods in the first place. [[kubectl]] is the tool for inspecting all of it. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
+
+Control-plane consequences (general knowledge):
+
+- **"Control plane" has two levels.** Kubernetes has its own control plane (API server, scheduler, controllers). A GPU cloud's control plane sits above it and translates "create an endpoint for tenant A" into Kubernetes objects, checks quotas, and meters the result ([[control-plane]]).
+- **Map the earlier pages onto Kubernetes objects.** A GPU Node is usually an 8-GPU bare-metal server. An inference replica is one Pod requesting GPUs, and an endpoint is a Deployment of such Pods. A Node failure costs a cold start while a replacement Pod reloads weights.
+- **GPUs are scheduled as whole, reserved units.** A requested GPU is held even when idle, so GPU-hour billing and capacity follow Pod lifetimes, not utilization ([[gpu-utilization-metrics]]). Multi-Node jobs need gang scheduling beyond the default scheduler ([[kubernetes-scheduling]]).
+
 ## Coverage so far
 
 | Domain | Status |
 | --- | --- |
 | Provisioning APIs | GPU/SKU background, inference sizing rules, the serving responsibilities an endpoint API must cover, and training-cluster vs endpoint provisioning shapes (unsourced mapping); no actual API sources yet |
 | Tenancy and quotas | Concurrency-as-memory from inference arithmetic; serving-side queuing/rate limits and training capacity blocks identified but unsourced |
-| Kubernetes and bare-metal lifecycle | Not covered beyond nvidia-smi, gang scheduling, the lifecycle rows of serving, and the batch-job vs service contrast |
+| Kubernetes and bare-metal lifecycle | Kubernetes basics sourced (Pods, Nodes, kubelet, runtime, scheduling by free resources, replacement on Node failure, kubectl triage); GPU device plugins, gang scheduling, Node health/drain, and bare-metal provisioning still unsourced |
 | Metering and billing | Utilization metrics, tokens-vs-GPU-hours reasoning, per-token vs GPU-hour products, inference as the recurring cost; no billing-pipeline sources |
-| Career | Interview talking points on GPU performance, capacity, batching, parallelism, inference vs serving, and training vs inference |
+| Career | Interview talking points on GPU performance, capacity, batching, parallelism, inference vs serving, training vs inference, and Kubernetes Pods/Nodes ("what happens when a Node dies?") |
 
 ## Suggested next sources
 
 - A provider's GPU instance docs and pricing page (e.g. AWS EC2 P-series, GCP A3, CoreWeave): provisioning, billing granularity, and how they present concurrency.
 - Modular LLM Inference Handbook follow-on chapters: continuous batching, prefix caching, quantization, routing, serverless vs self-hosted (ordered list in [[inference-optimization]]).
 - vLLM / TensorRT-LLM documentation on continuous batching and paged attention: the scheduling half of serving, from the engine authors.
-- Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling: lifecycle.
+- Kubernetes Basics Module 2 (Deployments) and Module 4 (Services); Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling (Kueue/Volcano): lifecycle.
 - Kubernetes ResourceQuota and cloud quota docs: tenancy and quotas.
 - NVIDIA DCGM docs: real utilization metrics for metering.
 - GPU cloud docs on training capacity (reserved clusters, capacity blocks, managed Slurm/Kubernetes): the training half of provisioning, quotas, and lifecycle.

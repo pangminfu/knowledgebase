@@ -3,7 +3,7 @@ type: concept
 tags: [provisioning, lifecycle, career]
 sources: [2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-12
-updated: 2026-11-12
+updated: 2026-11-22
 ---
 
 # Model parallelism
@@ -43,3 +43,4 @@ updated: 2026-11-12
 - [[kv-cache]]: sharded alongside the heads.
 - [[memory-bandwidth]]: the per-GPU bandwidth that comms is weighed against.
 - [[flops]]: peak flops used in the 1040 ratio.
+- [[kubernetes-scheduling]]: how a multi-GPU replica is placed on a Node, and why multi-Node gangs need extra tooling.

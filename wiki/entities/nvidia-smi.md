@@ -3,7 +3,7 @@ type: entity
 tags: [metering-billing, lifecycle]
 sources: [2026-11-10-deep-learning-brrrr-first-principles]
 created: 2026-11-10
-updated: 2026-11-10
+updated: 2026-11-22
 ---
 
 # nvidia-smi
@@ -18,10 +18,11 @@ NVIDIA's command-line tool ("System Management Interface") for checking the stat
 
 ## Why it matters for a GPU cloud
 
-- Node health checks and break/fix triage commonly start with nvidia-smi: is the GPU visible, are there ECC (memory error-correction) errors, is it throttling on temperature or power? This ties into bare-metal lifecycle. (general knowledge)
+- Node health checks and break/fix triage commonly start with nvidia-smi: is the GPU visible, are there ECC (memory error-correction) errors, is it throttling on temperature or power? This ties into bare-metal lifecycle ([[kubernetes-node]]). (general knowledge)
 - Fleet-scale monitoring usually uses NVIDIA DCGM rather than parsing nvidia-smi output. (general knowledge)
 
 ## Related
 
 - [[gpu-utilization-metrics]]: what GPU-Util does and doesn't mean.
 - [[nvidia-a100]]: an example GPU it reports on.
+- [[kubectl]]: `kubectl exec <pod> -- nvidia-smi` checks GPUs from inside a Pod.

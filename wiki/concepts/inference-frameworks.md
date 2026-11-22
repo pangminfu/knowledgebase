@@ -36,7 +36,7 @@ These are *inference* tools. Training uses a different stack (PyTorch, JAX, Deep
 
 ## Why it matters for a GPU cloud
 
-- The framework is the unit the control plane deploys: a container image with a model and a GPU allocation. Its startup time (loading weights) sets cold-start time for autoscaling, and its health endpoint and metrics feed lifecycle and metering. (general knowledge)
+- The framework is the unit the control plane deploys: a [[container]] image with a model and a GPU allocation, run as a [[kubernetes-pod|Pod]]. Its startup time (loading weights) sets cold-start time for autoscaling, and its health endpoint and metrics feed lifecycle and metering. (general knowledge)
 - Framework choice changes how many requests fit on a GPU (batching and cache management), so the same SKU can yield different tokens/sec per dollar. (general knowledge; see [[inference-optimization]])
 
 ## Related

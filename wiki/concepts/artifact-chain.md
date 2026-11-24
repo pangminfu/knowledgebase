@@ -16,24 +16,24 @@ An **artifact chain** is a way of running the [[software-development-lifecycle]]
 
 | Artifact | Written by | Approved by | Its acceptance triggers |
 | --- | --- | --- | --- |
-| `intent.md`: problem, proposed outcome, affected users/systems, constraints, open questions | The originator with Claude, or a monitoring agent | Product owner (merge = accept, closed review = reject) | The requirements & design pass |
-| `spec.md`: requirements and design, with flagged policy conflicts | Claude, constrained by policy skills | Product owner; tech lead for higher-risk changes | Plan mode |
-| `plan.md`: files that change, order of work, risks, proof (tests) | Claude in plan mode, interviewing the engineer | Engineer; tech lead/architect for higher risk | Implementation |
-| Diff and tests | Claude | Code owner, through PR review | The CI/CD pipeline on merge |
-| PR with review findings | Agentic review passes + humans | Code owner (branch protection) | Deploy, up to the production gate |
-| Incident record / new `intent.md` | Agent after a [[control-bands\|control-band]] breach | Service owner triages | The next loop |
+| `intent.md`: problem, proposed outcome, affected users/systems, constraints, open questions | The originator brainstorming with Claude (from an idea, a ticket, or an alert); in the closed loop, an agent | Product owner reviews and corrects it before commit; accept = merge, reject = closed review | The requirements & design pass |
+| `spec.md`: requirements and design, with flagged areas of concern (e.g. contradicting policies) | Claude, constrained by policy skills; the product owner reviews but doesn't write it | Product owner (resolves flagged concerns with the named policy owners; consults a technical lead for higher-risk changes) | Plan mode |
+| `plan.md`: files that change, order of work, risks, proof (tests) | Claude in plan mode, interviewing the engineer | Engineer; tech lead or architect for higher risk | Implementation |
+| Diff and tests | Claude | Code owner, through PR review | — (reviewed as part of the PR) |
+| PR with review findings | Agentic review passes + humans | Code owner (branch protection) | The CI/CD pipeline on merge, up to the production gate |
+| Incident record / new `intent.md` | Agent after a [[control-bands\|control-band]] breach; post-mortem written to a lessons file after an incident | Service owner or on-call engineer triages | The next loop |
 
 (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 - Early stages use markdown because a product owner and an agent can both read and edit the same file. From build onward, the artifact is code and its records. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- `spec.md` is committed next to `intent.md`: together they record what was asked for and what was decided. When implementation departs from the plan, `plan.md` is updated in the same commit (a hook can enforce this). PR review checks the diff against `spec.md` and `plan.md`. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- `spec.md` is committed next to `intent.md`: together they record what was asked for and what was decided. When implementation departs from the plan, `plan.md` is updated in the same commit (the playbook suggests considering a hook to enforce this). PR review checks the diff against `spec.md` and `plan.md`. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 - The design-stage log includes the prompt that produced the spec and the versions of the skills in force, so the policy applied to a decision can be reconstructed. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- Non-engineers don't need to learn git. A connector lets Claude commit their markdown files from the chat app. For one product, the simplest home is an `intent/` folder in the product repo; a separate intent repo pays off only when intent spans many repos. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- Non-engineers don't need to learn git. A connector to the version-control system (e.g. GitHub) lets Claude commit their markdown files from claude.ai or Cowork. For one product, the simplest home is an `intent/` folder in the product repo; a separate intent repo is worth the overhead only when intent spans many repos (in a monorepo it is a directory). (src: [[2026-11-24-ai-native-sdlc-playbook]])
 - Adoption is gradual. Teams first prompt each step by hand. The end state is a loop where each accepted artifact fires the next gate, and humans spend their attention at the gates. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
-### Measuring with git timestamps
+### Measuring from git and PR history
 
-Because every handoff is a commit, process metrics come straight from git: intent→spec time, spec commits made after the first `plan.md` (rework), plan-approval→merged-PR time, and how often the merged diff still matches `plan.md`. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+Because every handoff is a commit, process metrics come straight from git and PR metadata: time to a committed `intent.md`, intent→spec time, `spec.md` commits made after the first `plan.md` (requirements rework), plan-approval→merged-PR time, and how often the merged diff still matches `plan.md`. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 ### Coexisting with existing tools
 

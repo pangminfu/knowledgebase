@@ -24,46 +24,46 @@ Catalog of every page in the wiki. One line per page: link — summary.
 - [[memory-bandwidth]] — DRAM↔SRAM data movement, memory-bound ops, compute intensity, the 208 flops/byte SKU ratio
 - [[operator-fusion]] — merging ops into one kernel to skip memory round-trips; what unfused softmax costs
 - [[framework-overhead]] — Python/framework/kernel-launch time that idles the GPU; how to detect it
-- [[gpu-utilization-metrics]] — GPU-Util vs % of peak FLOPS vs DCGM; implications for metering
+- [[gpu-utilization-metrics]] — GPU-Util (NVML: % of time any kernel ran) vs MFU vs DCGM profiling fields (SM active, tensor pipe, DRAM active); implications for metering
 - [[kv-cache]] — the per-token attention cache: why sampling needs it, what it costs (~2 MB/token at 52B), when to skip it, offload/prefix-caching
-- [[gpu-memory-capacity]] — weights vs kv cache vs activations; how leftover memory sets max concurrency
-- [[inference-batching]] — tokens per forward pass as the batch axis (batch size at decode); 208-token crossover; batch size trades latency, throughput, cost; continuous batching pointer
+- [[gpu-memory-capacity]] — weights vs kv cache vs activations; 52B on 4×A100-40GB ≈ 26,700 cached tokens (source misprints 23,000); how leftover memory sets max concurrency
+- [[inference-batching]] — tokens per forward pass as the batch axis (batch size at decode); 208-token crossover; batch size trades latency, throughput, cost; continuous batching (Orca) and paged KV memory
 - [[model-parallelism]] — tensor vs pipeline parallelism; 4 comms/layer, the 1040 flops-per-byte test, and the latency floor
 - [[inference-latency-model]] — the two-regime equations (memory-bound / flops-bound) for per-token latency; naive estimates 24–38% under measured, gap explained by bandwidth efficiency, intermediates, comms
 - [[llm-inference]] — what running a model means; tokens, forward pass, request path (tokenize → schedule → prefill → decode); inference vs serving table
-- [[prefill-and-decode]] — the two GPU phases of a request: parallel prompt pass (compute-heavy) vs one-token-at-a-time decode (memory-bound); pricing asymmetry
+- [[prefill-and-decode]] — the two GPU phases of a request: compute-bound prefill (also emits the first token) vs memory-bound decode; TTFT vs TPOT; chunked prefill and disaggregated serving; pricing asymmetry
 - [[inference-serving]] — everything around inference that makes it a service; serving responsibilities mapped to the four control-plane domains; serverless vs self-hosted
-- [[inference-frameworks]] — inference servers/frameworks (vLLM, SGLang, TensorRT-LLM, MAX): what they do per replica and why the control plane cares
-- [[inference-optimization]] — hub and reading roadmap: which bottleneck each technique (batching, caching, quantization, speculative decoding, parallelism, routing) attacks
-- [[per-token-pricing]] — per-token vs GPU-hour products; why token cost depends on batching; what each metering pipeline must capture
-- [[training-vs-inference]] — the build vs operate lifecycle; comparison table; how each workload differs for provisioning, quotas, lifecycle, and billing
-- [[fine-tuning]] — adapting an existing model by updating some weights; training-shaped job whose output the serving side deploys
+- [[inference-frameworks]] — inference servers/frameworks (vLLM, SGLang, TensorRT LLM, MAX, LMDeploy): maker, license, what each is known for; per-replica role vs platform scaling
+- [[inference-optimization]] — hub and reading roadmap: how each technique (continuous batching, KV/prefix caching, quantization, speculative decoding, parallelism, routing) works and which bottleneck it attacks
+- [[per-token-pricing]] — per-token vs GPU-hour products; why token cost depends on batching; current provider price structure (output premium, cached-input and batch discounts, long-context tiers); metering needs
+- [[training-vs-inference]] — the build vs operate lifecycle; comparison table; how each workload differs for provisioning, quotas, lifecycle, and billing; contradictions on the source's training/inference durations
+- [[fine-tuning]] — adapting an existing model; which weights change (full vs LoRA/QLoRA adapters); training-shaped job whose output (model or adapter) the serving side deploys
 - [[control-plane]] — control plane vs data plane at two levels: Kubernetes' own (API server, scheduler, controllers, reconciliation) and the GPU cloud's (the four domains)
 - [[kubernetes-service]] — stable address and load balancer for a label-selected set of Pods; type ladder ClusterIP ⊂ NodePort ⊂ LoadBalancer; endpoints follow replicas; readiness, scale-down race, per-connection limits for inference endpoints
 - [[kubernetes-labels-and-selectors]] — key/value tags and label queries; how Services and Deployments find Pods; labels across provisioning, tenancy, rollouts, and metering
 - [[kubernetes-pod]] — smallest unit Kubernetes runs: containers sharing IP and volumes on one Node; replaced not moved; an inference replica = a Pod requesting GPUs
-- [[kubernetes-node]] — a worker machine (VM or bare metal) running Pods, kubelet, and a runtime; GPU Node software and bare-metal lifecycle (cordon/drain)
+- [[kubernetes-node]] — worker machine (VM or bare metal) running Pods; kubelet + runtime (+ kube-proxy); Lease heartbeats, grace period, taint-based eviction; NodePort; GPU Node software, cordon/drain
 - [[kubernetes-deployment]] — keeps N identical Pods running via a ReplicaSet; scaling via replica count; get deployments status columns; rolling updates; with a Service, maps to a dedicated inference endpoint
-- [[kubernetes-replicaset]] — enforces a replica count for one Pod-template version; DESIRED vs CURRENT; naming by pod-template-hash; Deployment → ReplicaSet → Pods
+- [[kubernetes-replicaset]] — enforces a replica count for one Pod-template version; DESIRED vs CURRENT; name suffix is the pod-template-hash, not random; Deployment → ReplicaSet → Pods
 - [[kubernetes-scaling]] — changing replica count by hand or autoscaler; desired-state loop; endpoints follow; GPU pitfalls: Pending, cold start, scaling signal, scale-to-zero pricing, drain on scale-down, quotas
-- [[kubernetes-scheduling]] — placing Pods on Nodes by resource requests; GPUs as whole extended resources; Pending on scale-out, fragmentation, gang scheduling, quotas in front
+- [[kubernetes-scheduling]] — filter/score placement by requests vs allocatable; GPUs as integer extended resources, DRA; built-in gang scheduling (beta, off by default in v1.37) vs Kueue/Volcano; fragmentation; quotas at admission
 - [[container]] — packaged app as an isolated process; image vs container vs registry; Docker vs containerd; GPU images and cold start
 - [[software-development-lifecycle]] — the SDLC: plan, design, build, test, deploy, maintain; traditional roles vs AI-native loop; beginner glossary (git, PR, CI/CD, environments, rollback)
-- [[artifact-chain]] — each stage commits a file the next stage reads; triggers, approvers, git-timestamp metrics, coexisting with Jira/ServiceNow as source of truth
-- [[agent-guardrails]] — advisory (CLAUDE.md, skills) vs deterministic (hooks, permissions, sandbox, branch protection) controls; separation of duties; managed settings key by key
-- [[deployment-gates]] — agent acts up to the production gate; autonomy tiered by environment; approval hooks; agent in CI/CD via MCP; rehearsed rollback; Kubernetes rollback on GPUs
+- [[artifact-chain]] — each stage commits a file the next stage reads; triggers, approvers, metrics from git and PR history, coexisting with Jira/ServiceNow as source of truth
+- [[agent-guardrails]] — advisory (CLAUDE.md, skills) vs deterministic (hooks, permissions, sandbox, branch protection, managed settings) controls; how hooks block; separation of duties; the playbook's managed-settings example with corrections
+- [[deployment-gates]] — agent acts up to the production gate; autonomy tiered by environment; approval hooks (and what a hook's "ask" really does); agent in CI/CD via MCP; rehearsed rollback; Kubernetes rollback on GPUs
 - [[control-bands]] — rolling mean ± σ, Western Electric rules; 1σ log / 2σ diagnose / 3σ propose; deterministic detection, breach → intent.md → eval; inference-platform metrics
 - [[evals]] — tests for an AI agent's behaviour; 20–50 real tasks re-run on config changes; incident → eval; vs feedback loop and verifier subagent
 
 ## Entities
 
-- [[nvidia-a100]] — Ampere datacenter GPU; spec table, SKU variants (PCIe/SXM, 40/80 GB), NVLink 300 GB/s
+- [[nvidia-a100]] — Ampere datacenter GPU (2020); spec-sheet TFLOPS by precision; per-variant memory, bandwidth, power, NVLink table; sources' 1.5 TB/s vs datasheet values
 - [[nvidia-smi]] — NVIDIA's GPU status CLI; DRAM usage, GPU-Util, health triage
 - [[kubernetes]] — container orchestration system; core objects (Pod, Node, Deployment/ReplicaSet, Service), labels, declarative desired state, namespaces; what it means for each control-plane domain
-- [[kubelet]] — per-Node agent that runs Pods for the control plane; heartbeats, probes, GPU device-plugin registration
+- [[kubelet]] — per-Node agent: CRI to the runtime, Lease heartbeats, container restarts, liveness/readiness/startup probes, GPU device-plugin registration and `Allocate`
 - [[containerd]] — the container runtime that pulls and runs images on each Node; replaced Docker in Kubernetes; GPU access via NVIDIA toolkit
 - [[kubectl]] — Kubernetes CLI cheat sheet: get/describe/logs/exec/proxy, expose/label/-l selectors, scale/get rs from the tutorials, plus GPU-node triage commands
-- [[claude-code]] — Anthropic's coding agent: plan/auto mode, CLAUDE.md, skills, hooks, subagents, worktrees, `claude -p`, MCP, managed settings; related products (Security, Tag, Design)
+- [[claude-code]] — Anthropic's agentic coding tool: features the playbook uses, the six permission modes, settings precedence and managed-settings delivery, related products (Design, Cowork, Security, Tag, Agent SDK) with status
 
 ## Syntheses
 

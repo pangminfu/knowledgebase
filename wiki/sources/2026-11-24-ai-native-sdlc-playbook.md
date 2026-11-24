@@ -1,10 +1,10 @@
 ---
 type: source
-tags: [software-delivery, ai-agents, lifecycle]
+tags: [software-delivery, ai-agents]
 sources: []
 raw: raw/2026-11-24-ai-native-sdlc-playbook.md
 url: https://claude.com/resources/articles/the-ai-native-sdlc-playbook
-author: Louis Claxton (Anthropic Applied AI)
+author: Louis Claxton (Anthropic)
 created: 2026-11-24
 updated: 2026-11-24
 ---
@@ -25,10 +25,10 @@ The [[software-development-lifecycle]] (SDLC) is the process that takes software
 The last stage closes the loop. A deterministic monitor watches production against [[control-bands]], and when a metric leaves its band, an agent diagnoses the problem and writes the next `intent.md`. Each incident also becomes a permanent [[evals|eval]] case. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 ![[raw/assets/sdlc-bottleneck-shift.png]]
-Two bars of the six stages. Before agents, Build is by far the longest stage. After agents, Build shrinks to a sliver, and Plan, Design, Test (review), Deploy (release), and Maintain keep their length. The time saved is labelled "cycle time reclaimed". (src: [[2026-11-24-ai-native-sdlc-playbook]])
+Two bars of the six stages. Before agents, Build is by far the longest stage. After agents, Build shrinks to a sliver, and Plan and Design (labelled "requirements"), Test ("review"), Deploy ("release"), and Maintain keep their length. The time saved is labelled "cycle time reclaimed". (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 ![[raw/assets/sdlc-line-vs-loop.png]]
-Left: the traditional SDLC as a straight line, where "one slow loop back is a new release cycle". Right: the AI-native SDLC as a circle of the same six stages around Claude, with "humans above the loop instigating, directing and governing". (src: [[2026-11-24-ai-native-sdlc-playbook]])
+Left: the traditional SDLC as a straight line, where "one slow loop back is a new release cycle". Right: the AI-native SDLC as a circle of the same six stages around Claude: "hours, not weeks, with humans above the loop instigating, directing and governing". (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 ## Key points
 
@@ -36,7 +36,7 @@ Left: the traditional SDLC as a straight line, where "one slow loop back is a ne
 
 - When build is no longer the bottleneck, three things follow: the bottleneck moves to plan, review/test, and deploy, which still run at human speed; per-line human review can't keep up once agents write most of the diff; governance costs rise because exceptions still go through committees that meet weekly or monthly. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 - Security example: security teams are sized for human output. When agents multiply code output, either the review queue grows or code ships under-reviewed. A regulated organization can accept neither, so its checks must keep pace with the agents. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- PRDs (product requirement documents), estimation rituals, and security reviews existed to force alignment before weeks or months of coding work. That justification weakens when coding takes hours. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- PRDs (product requirement documents), estimation rituals, and product security reviews existed to force alignment before weeks, months, or quarters of development work. That justification weakens when writing code is no longer the slowest, most expensive stage. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 - Other names for the same idea: agentic SDLC, AI SDLC, agentic software development. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 ### Traditional vs AI-native, stage by stage
@@ -81,7 +81,7 @@ The playbook calls each practice a "play". Every play lists what changes, prereq
 | Maintain | Recurring scans | Scheduled security scans (Claude Security); findings go through the review gate | Repos on schedule / scan vs production findings |
 | Maintain | Claude Tag | Claude as an incident-channel member under its own identity | (none given) |
 
-(src: [[2026-11-24-ai-native-sdlc-playbook]]) DORA = DevOps Research and Assessment. Its delivery metrics were four keys (deployment frequency, lead time for changes, change failure rate, time to restore service) until 2024; it now uses five: change lead time, deployment frequency, failed deployment recovery time, change fail rate, deployment rework rate. The playbook only says "DORA measures". (metric names: general knowledge, dora.dev)
+(src: [[2026-11-24-ai-native-sdlc-playbook]]) DORA = DevOps Research and Assessment. The playbook only says "DORA measures". DORA's original "four keys" were deployment frequency, lead time for changes, change failure rate, and time to restore service; in 2023 time to restore became *failed deployment recovery time*, and in 2024 a fifth metric, *deployment rework rate*, was added. The current five: change lead time, deployment frequency, failed deployment recovery time, change fail rate, deployment rework rate. (general knowledge; verified: [DORA's software delivery performance metrics](https://dora.dev/guides/dora-metrics/), [A history of DORA's software delivery metrics](https://dora.dev/insights/dora-metrics-history/))
 
 ![[raw/assets/sdlc-play-dependencies.png]]
 The adoption-order graph. The five plays with no prerequisites sit on top: capture intent, `CLAUDE.md`, feedback loop, hooks, plan mode. `CLAUDE.md` leads to skills, subagents, and evals; the feedback loop also leads to evals (and softly to subagents). Skills plus intent lead to requirements & design. Evals lead to PR review (skills softly too), then CI/CD (which also needs hooks), then closing the loop (which also needs intent). Plan mode has nothing after it. Dotted arrows are soft dependencies. (src: [[2026-11-24-ai-native-sdlc-playbook]])
@@ -97,8 +97,8 @@ The adoption-order graph. The five plays with no prerequisites sit on top: captu
 
 - "The agent may act up to the production gate and cannot pass it." Autonomy is tiered per environment: free in development, partial in staging, prepare-only in production, where a named release manager authorizes. Details: [[deployment-gates]]. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 - Rollback should be the most rehearsed path: one command the agent can run, exercised regularly in staging. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- Detection stays deterministic: a script compares a metric with its rolling mean and standard deviation. At 1σ it only logs, at 2σ it invokes Claude read-only to diagnose, at 3σ Claude may open a PR or run a pre-approved runbook. Details: [[control-bands]]. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- Scheduled security scans: a scan is valid only for one codebase and one model, and both go stale (code changes weekly; each model generation finds bugs the last one missed). So scans run on a schedule, and findings go through the same review gate as any change. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- Detection stays deterministic: a version-controlled, unit-tested script compares a metric with its rolling mean and standard deviation, using Western Electric or similar rules to catch slow drift as well as spikes. At 1σ it only logs, at 2σ it invokes Claude read-only to diagnose, at 3σ Claude may open a PR into the review gate or trigger a pre-approved runbook. Details: [[control-bands]]. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- Scheduled security scans: a scan is "a point-in-time statement about a codebase under a particular model", and both halves go stale (the code changes every week; each model generation finds vulnerabilities the previous one missed). So scans run on a schedule with no human in the invocation path, and findings go through the same gates as any other change: a one-PR fix through the review gate, anything larger as an `intent.md`. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 ![[raw/assets/sdlc-claude-tag-incident.png]]
 A Slack incident channel. A human reports a 5xx rise after a deploy and tags @claude. Claude matches error signatures against the deploy diff, blames a new cache key that drops the tenant id, and asks before running the rollback rehearsed in staging that morning. After the human says "Go", Claude rolls back, confirms the 5xx rate is back inside its band, and writes the post-mortem to `lessons/2026-06-checkout-cache.md`. (src: [[2026-11-24-ai-native-sdlc-playbook]])
@@ -118,7 +118,7 @@ A Slack incident channel. A human reports a 5xx rise after a deploy and tags @cl
 ## Questions raised
 
 - What do the DORA metrics measure exactly, and how do teams collect them? (Next: the DORA research site or the *Accelerate* book.)
-- What are the Western Electric rules, and how do they catch slow drift as well as spikes? (Next: an SPC / control-chart primer.)
+- What are the Western Electric rules, and how do they catch slow drift as well as spikes? (Answered in [[control-bands]].)
 - How do the playbook's controls apply to infrastructure changes, such as a control-plane rollout across a GPU fleet, where a "rollback" may mean draining Nodes?
 - Agentic review and agent-written code both come from models. How independent are they really, and when is that "separation of duties" not enough?
 - The companion article "how Anthropic secures its AI-native SDLC" covers how these controls compose at production scale.

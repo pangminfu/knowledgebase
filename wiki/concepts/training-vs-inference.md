@@ -44,7 +44,7 @@ flowchart LR
 
 (src: [[2026-11-22-training-vs-inference]])
 
-- **Weights:** training changes them, and inference never does. [[fine-tuning]] changes them, so it counts as training. (src: [[2026-11-22-training-vs-inference]])
+- **Weights:** training changes them, and inference never does. [[fine-tuning]] changes them, so it counts as training. (src: [[2026-11-22-training-vs-inference]]) Precisely: full fine-tuning updates all base weights, while LoRA-style fine-tuning freezes them and trains a small added adapter ([[fine-tuning#Which weights change]]). (general knowledge)
 - **Which costs more over time:** inference often does. Training is paid roughly once, while inference spends GPU compute, memory, and network bandwidth on every request, especially with heavy use or long prompts. (src: [[2026-11-22-training-vs-inference]])
 - **Hardware bottleneck:** training pushes large batches of examples through the model, so it tends to be compute-bound (general knowledge). Inference decode with small batches is memory-bandwidth-bound: each new token rereads all the weights ([[prefill-and-decode]], [[gpu-performance-regimes]]). (src: [[2026-11-12-transformer-inference-arithmetic]])
 - **"Smaller clusters" is a generalization.** A model too large for one GPU still needs a multi-GPU replica (e.g. 52B on 4× A100 in [[model-parallelism]]). (src: [[2026-11-12-transformer-inference-arithmetic]]) The difference is that inference replicas are many and independent, while a training job is one large coupled unit. (general knowledge)
@@ -55,9 +55,9 @@ The handbook gives the contrast, and the mapping to domains below is this wiki's
 
 | Domain | Training workload | Inference workload |
 | --- | --- | --- |
-| **Provisioning** | Allocate a whole cluster: N nodes × 8 GPUs with a fast interconnect between nodes, for a fixed window. It is all-or-nothing (gang scheduling), and topology matters as much as GPU count. | Create an endpoint: a model, a GPU SKU, a replica size from [[gpu-memory-capacity]], and min/max replicas. Placement is chosen to be near users. |
+| **Provisioning** | Allocate a whole cluster: N nodes × 8 GPUs with a fast interconnect between nodes, for a fixed window. It is all-or-nothing (gang scheduling: start every worker or none), and topology matters as much as GPU count. In Kubernetes, gang scheduling is an add-on (e.g. Volcano, Kueue) or the built-in feature that is beta since v1.37 and disabled by default (general knowledge; verified: [Kubernetes docs: Gang Scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/gang-scheduling/)). | Create an endpoint: a model, a GPU SKU, a replica size from [[gpu-memory-capacity]], and min/max replicas. Placement is chosen to be near users. |
 | **Tenancy and quotas** | Quota is GPUs or nodes per tenant, often as reserved capacity blocks with a start and end date. Jobs may tolerate preemption if they checkpoint. | Quota is rate limits (requests or tokens per minute) plus max replicas or GPUs. Shared replicas mix tenants in one batch ([[inference-batching]]). |
-| **Lifecycle** | A batch job (Kubernetes Job, Slurm). One bad GPU can stall or crash the whole job, so the job checkpoints, the failed node is replaced, and the job resumes. Node health checks gate admission. | A long-running service ([[kubernetes-deployment\|Kubernetes Deployment]]). The system does rolling model upgrades, health checks, autoscaling, and handles cold start while weights load. A bad node loses one replica, not the service. |
+| **Lifecycle** | A batch job (Kubernetes Job, Slurm). Training is synchronous, so one bad GPU can stall or crash the whole job; the job checkpoints, the failed node is replaced, and the job resumes. Node health checks gate admission. Scale example: Llama 3 405B pretraining on 16K H100s saw 466 job interruptions in a 54-day snapshot; 419 were unexpected, and about 78% of those were attributed to confirmed or suspected hardware issues (general knowledge; verified: [The Llama 3 Herd of Models, §3.3.4](https://arxiv.org/abs/2407.21783)). | A long-running service ([[kubernetes-deployment\|Kubernetes Deployment]]). The system does rolling model upgrades, health checks, autoscaling, and handles cold start while weights load. A bad node loses one replica, not the service. |
 | **Metering and billing** | GPU-hours for the reserved window, usually committed in advance and paid whether used or not. | Per token (serverless) or per endpoint GPU-hour (dedicated). It is continuous and traffic-driven ([[per-token-pricing]]). |
 | **What "good" looks like** | High utilization over a long job, few restarts, and fast recovery. | Latency targets met at the lowest cost per token, with no dropped requests. |
 
@@ -70,6 +70,11 @@ The handbook gives the contrast, and the mapping to domains below is this wiki's
 - [[per-token-pricing]]: how the ongoing inference cost is billed.
 - [[model-parallelism]]: why some inference replicas still span several GPUs.
 - [[kubernetes-scheduling]]: gang scheduling for multi-node training jobs vs single-Pod placement for most inference replicas.
+
+## Contradictions
+
+- **Training time.** The handbook's table says training takes "hours to weeks" (src: [[2026-11-22-training-vs-inference]]). Frontier pretraining runs take longer: the Llama 3 report describes a 54-day window that was only a snapshot of 405B pretraining (general knowledge; verified: [The Llama 3 Herd of Models](https://arxiv.org/abs/2407.21783)). "Hours to weeks" fits fine-tuning and smaller models; frontier pretraining runs for months.
+- **Inference time.** "Milliseconds to seconds" (src: [[2026-11-22-training-vs-inference]]) is about the time to first token or a short answer. A long generation is produced one token at a time ([[prefill-and-decode]]), so long or reasoning-heavy answers can take tens of seconds or more. (general knowledge)
 
 ## Open questions
 

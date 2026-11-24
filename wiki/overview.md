@@ -39,20 +39,20 @@ The second source turns the same physics into a sizing procedure for model servi
 The chain is four arithmetic steps, laid out end to end in [[2026-11-12-sizing-a-gpu-inference-deployment]]:
 
 1. **Weights → GPUs.** 2 bytes per parameter at 16-bit; a 52B model is 104 GB, so it cannot fit on a 40 GB card ([[gpu-memory-capacity]]).
-2. **Leftover memory → concurrency.** The [[kv-cache]] costs ~2 MB per token for that model, so the remaining 56 GB on four cards is ~28,000 cached tokens (the source prints 23,000, an arithmetic slip; see [[gpu-memory-capacity]]).
+2. **Leftover memory → concurrency.** The [[kv-cache]] costs ~2 MB per token for that model (exactly 2,097,152 bytes), so the remaining 56 GB on four cards holds ≈26,700 cached tokens, about 13 requests of 2048 tokens (the source prints 23,000, an arithmetic slip; see [[gpu-memory-capacity]]).
 3. **Concurrency → cost.** Below ~208 tokens per forward pass (at decode: a batch of ~208 sequences) the GPU is memory-bandwidth-bound; above it, flops-bound and cheaper per token ([[inference-batching]]).
 4. **GPUs → latency floor.** Tensor parallelism cuts compute by `1/N` but adds a fixed four-per-layer communication cost, so more GPUs stop helping past a point ([[model-parallelism]], [[inference-latency-model]]).
 
 Control-plane consequences (general knowledge unless cited):
 
-- **Quotas are memory limits.** Concurrency follows from `(VRAM − weights) ÷ (cache per token × context)`, not from a GPU count (src: [[2026-11-12-transformer-inference-arithmetic]]).
-- **Multi-GPU replicas are gang-scheduled.** A model too large for one card needs all the GPUs of a node, wired with NVLink — a topology constraint, not a quantity constraint. (general knowledge)
+- **Quotas are memory limits.** Concurrency follows from `(VRAM − weights) ÷ (cache per token × context)`, not from a GPU count (capacity arithmetic: src: [[2026-11-12-transformer-inference-arithmetic]]; quota framing: general knowledge).
+- **Multi-GPU replicas are a placement constraint.** A model too large for one card needs several GPUs (the 52B example needs at least three A100-40GB for its weights and uses four, src: [[2026-11-12-transformer-inference-arithmetic]]), ideally on one NVLink-connected node. On Kubernetes that is one Pod requesting N GPUs, placed all-or-nothing on one Node; replicas spanning several Nodes need true gang scheduling ([[kubernetes-scheduling]]). Topology matters, not just GPU count. (general knowledge)
 - **Tokens/second is the inference-native metering unit**, and it is not fixed per SKU: it depends on the batch the provider can pack (src: [[2026-11-12-transformer-inference-arithmetic]]; product framing: general knowledge).
 - **Memory-bound replicas look busy.** GPU-Util can read high while the GPU does a fraction of its peak flops ([[gpu-utilization-metrics]]).
 
 ### The layer the control plane owns: serving
 
-The third source adds vocabulary for the layer above the GPU arithmetic. **Inference** is the computation: tokens in, next-token probabilities out, through [[prefill-and-decode]] ([[llm-inference]]). **Serving** is everything that turns it into a production service: API, queuing and scheduling, batching across requests, load balancing, autoscaling, model versioning, health checks, observability, resource allocation ([[inference-serving]]). Engines like vLLM, SGLang, TensorRT-LLM, and MAX do both on each replica ([[inference-frameworks]]). (src: [[2026-11-21-what-is-llm-inference]])
+The third source adds vocabulary for the layer above the GPU arithmetic. **Inference** is the computation: tokens in, next-token probabilities out, through [[prefill-and-decode]] ([[llm-inference]]). **Serving** is everything that turns it into a production service: an API surface (HTTP/gRPC), request queuing and scheduling, batching across concurrent requests, load balancing across replicas, autoscaling, model loading and version management, health checks, observability, resource allocation ([[inference-serving]]). Frameworks like vLLM, SGLang, TensorRT LLM, and MAX handle both, which is why "inference framework" and "serving framework" often name the same systems ([[inference-frameworks]]). (src: [[2026-11-21-what-is-llm-inference]])
 
 ```mermaid
 flowchart TB
@@ -69,7 +69,7 @@ Control-plane consequences (general knowledge unless cited):
 
 ### Two workloads: training vs inference
 
-A model's life has two phases. **Training** (build) runs once or periodically: it is a long job on multi-node clusters and is mostly a one-time cost. **Inference** (operate) runs on every request, in milliseconds to seconds, and costs money for as long as there is traffic, so it often becomes the larger expense over time. [[fine-tuning]] changes weights, so it counts as training. See [[training-vs-inference]]. (src: [[2026-11-22-training-vs-inference]])
+A model's life has two phases. **Training** (build) runs once or periodically, as long, expensive jobs on GPU/TPU clusters, and is "more or less a one-time expense". **Inference** (operate) runs on every request, in milliseconds to seconds, and its cost scales with traffic, so it can become the larger long-term expense. [[fine-tuning]] changes weights, so it counts as training. See [[training-vs-inference]]. (src: [[2026-11-22-training-vs-inference]]) The source's durations are rough: frontier pretraining runs for months, and long or reasoning-heavy responses take tens of seconds (see [[training-vs-inference#Contradictions]]).
 
 Control-plane consequences (general knowledge):
 
@@ -78,13 +78,13 @@ Control-plane consequences (general knowledge):
 
 ### Where workloads run: Kubernetes Pods and Nodes
 
-The fifth source starts the lifecycle domain. In [[kubernetes]], a [[kubernetes-node|Node]] is a worker machine, virtual or physical, and a [[kubernetes-pod|Pod]] is the smallest unit it runs: one or more [[container|containers]] sharing an IP and storage, always on one Node. The [[control-plane]] schedules Pods onto Nodes by free resources ([[kubernetes-scheduling]]). Each Node runs a [[kubelet]] and a container runtime ([[containerd]]). When a Node fails, its Pods are not moved: identical replacements are scheduled elsewhere. A [[kubernetes-deployment|Deployment]] creates the Pods in the first place. [[kubectl]] is the tool for inspecting all of it. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
+The fifth source starts the lifecycle domain. In [[kubernetes]], a [[kubernetes-node|Node]] is a worker machine, virtual or physical, and a [[kubernetes-pod|Pod]] is the smallest unit it runs: one or more [[container|containers]] sharing an IP and storage, always on one Node. The [[control-plane]] schedules Pods onto Nodes by free resources ([[kubernetes-scheduling]]). Each Node runs a [[kubelet]] and a container runtime ([[containerd]]). When a Node fails, its Pods are not moved: identical replacements are scheduled elsewhere. A [[kubernetes-deployment|Deployment]] creates the Pods in the first place. [[kubectl]] is the tool for inspecting all of it. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]]) Replacement happens only for Pods a controller such as a Deployment manages; a bare Pod on a dead Node is not recreated. (general knowledge; verified: [Kubernetes docs: Pods](https://kubernetes.io/docs/concepts/workloads/pods/))
 
 Control-plane consequences (general knowledge):
 
 - **"Control plane" has two levels.** Kubernetes has its own control plane (API server, scheduler, controllers). A GPU cloud's control plane sits above it and translates "create an endpoint for tenant A" into Kubernetes objects, checks quotas, and meters the result ([[control-plane]]).
 - **Map the earlier pages onto Kubernetes objects.** A GPU Node is usually an 8-GPU bare-metal server. An inference replica is one Pod requesting GPUs, and an endpoint is a Deployment of such Pods. A Node failure costs a cold start while a replacement Pod reloads weights.
-- **GPUs are scheduled as whole, reserved units.** A requested GPU is held even when idle, so GPU-hour billing and capacity follow Pod lifetimes, not utilization ([[gpu-utilization-metrics]]). Multi-Node jobs need gang scheduling beyond the default scheduler ([[kubernetes-scheduling]]).
+- **GPUs are scheduled as whole, reserved units.** A requested GPU is held even when idle, so GPU-hour billing and capacity follow Pod lifetimes, not utilization ([[gpu-utilization-metrics]]). Multi-Node jobs need gang scheduling (all Pods or none): add-ons such as Kueue or Volcano, or the built-in Gang Scheduling feature, beta since v1.37 and off by default ([[kubernetes-scheduling]]; verified: [Kubernetes docs: Gang Scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/gang-scheduling/)).
 
 ### Reaching workloads: Services and labels
 
@@ -120,8 +120,8 @@ Control-plane consequences (general knowledge):
 
 - A provider's GPU instance docs and pricing page (e.g. AWS EC2 P-series, GCP A3, CoreWeave): provisioning, billing granularity, and how they present concurrency.
 - Modular LLM Inference Handbook follow-on chapters: continuous batching, prefix caching, quantization, routing, serverless vs self-hosted (ordered list in [[inference-optimization]]).
-- vLLM / TensorRT-LLM documentation on continuous batching and paged attention: the scheduling half of serving, from the engine authors.
-- Kubernetes Basics Module 2 (Deployments) and Module 6 (rolling updates); Kubernetes autoscaling docs (HPA, cluster autoscaler) and an LLM autoscaler (KServe or KEDA); Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling (Kueue/Volcano): lifecycle.
+- vLLM / TensorRT LLM documentation on continuous batching (per-step scheduling) and PagedAttention (KV-cache memory management): the engine half of serving, from the engine authors.
+- Kubernetes Basics Module 2 (Deployments) and Module 6 (rolling updates); Kubernetes autoscaling docs (HPA, cluster autoscaler) and an LLM autoscaler (KServe or KEDA); Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling (built-in Gang Scheduling / PodGroup API, Kueue, Volcano): lifecycle.
 - Gateway API Inference Extension / llm-d / KServe docs: how inference platforms route requests above a plain Service.
 - Kubernetes ResourceQuota and cloud quota docs: tenancy and quotas.
 - NVIDIA DCGM docs: real utilization metrics for metering.
@@ -133,7 +133,7 @@ Control-plane consequences (general knowledge):
 
 ### The bottleneck moves
 
-The [[software-development-lifecycle]] (SDLC) runs six stages: plan, design, build, test, deploy, maintain. It was built when writing code was the slowest stage, and its controls assume a human does every step. Coding agents shrink build to hours, so the human-speed stages around it (requirements, review, release) become the constraint, and per-line human review stops scaling. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+The [[software-development-lifecycle]] (SDLC) runs six stages: plan, design, build, test, deploy, maintain. Its process was built when writing code was the most time-consuming and expensive stage, with each stage owned by a different role. Coding agents collapse build to hours, so the human-speed stages around it (requirements, review, release) become the constraint. Humans reviewing every line gives way to layered agent review, with human review reserved for regulated and critical code. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 ![[raw/assets/sdlc-bottleneck-shift.png]]
 Before agents, Build is the longest of six stages. After agents, it shrinks to a sliver and the other stages keep their length. (src: [[2026-11-24-ai-native-sdlc-playbook]])
@@ -148,11 +148,11 @@ flowchart LR
   M -->|"control band breached"| I
 ```
 
-1. **[[artifact-chain]].** Each stage commits a file that starts the next. Git history becomes the trigger, the metric source, and the audit trail. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-2. **[[agent-guardrails]].** Advisory instructions (`CLAUDE.md`, skills) make good behaviour likely. Deterministic controls (hooks, permissions, sandbox, branch protection) make violations close to impossible. The agent that writes code never approves it, and the agent's own configuration is regression-tested with [[evals]]. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+1. **[[artifact-chain]].** Each stage ends by committing an artifact, and that commit starts the next stage (an accepted `intent.md` triggers the design pass, an approved `spec.md` triggers plan mode, a merged PR triggers the pipeline). The chain of commits is the audit trail, and git and PR history supply the stage metrics. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+2. **[[agent-guardrails]].** Advisory instructions (`CLAUDE.md`, skills) make compliance likely and violations rare; deterministic controls (hooks, permissions, sandbox, branch protection) make violations close to impossible. The agent that wrote the code has no way to approve it: a human approves through branch protection. The agent's own configuration is regression-tested with [[evals]]. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 3. **[[deployment-gates]].** The agent acts up to the production gate, never past it: free in development, prepare-only in production. Rollback is the most rehearsed path. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
-The loop closes in maintenance: a deterministic script watches production against [[control-bands]], and the size of a breach decides whether the agent logs, diagnoses read-only, or proposes a fix through the gates. Its finding becomes the next `intent.md`. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+The loop closes in maintenance: a version-controlled, unit-tested script (no model involved) watches one metric against [[control-bands]]. The size of a breach sets the response: at 1σ the script only logs, at 2σ it invokes Claude read-only to diagnose, at 3σ Claude may act, but only by opening a PR into the review gate or triggering a pre-approved runbook. The diagnosis is written as the next `intent.md`. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 The single source so far is a vendor playbook built around [[claude-code]]. Its control design is general; its speed claims are the vendor's. (general knowledge)
 

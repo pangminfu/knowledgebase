@@ -8,18 +8,22 @@ updated: 2026-11-24
 
 # Evals (agent evaluations)
 
-An **eval** is a test for an AI system's behaviour: a prompt (a task) plus checks that define an acceptable result. A suite of evals tells you whether an agent still does its work to the same standard after something changes: a new model, a rewritten prompt, an edited skill. The playbook calls continuous evals "the AI-native equivalent of stage-gate QA". (src: [[2026-11-24-ai-native-sdlc-playbook]]) Analogy: a regression test suite, but for the agent's instructions rather than the product's code. (analogy: general knowledge)
+An **eval** is a test for an AI system's behaviour: a prompt (a task) plus the checks that define an acceptable result. A suite of evals tells you whether an agent still does its work to the same standard after something changes: a new model, a rewritten prompt, an edited skill. The playbook calls evals "the AI-native equivalent of stage-gate QA" (a QA sign-off between stages). (src: [[2026-11-24-ai-native-sdlc-playbook]]) Analogy: a regression test suite, but for the agent's instructions rather than the product's code. (analogy: general knowledge)
 
 ## Details
 
 - **What to test.** The configuration that steers the agent (`CLAUDE.md`, skills, hooks) deserves the same regression testing as code, because changing it changes what the agent produces. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- **Building the suite.** Collect 20–50 real tasks from recent work with their accepted outcomes. Each becomes an eval: the prompt, plus checks such as tests pass, lint clean, behaviour unchanged, policy followed. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- **When it runs.** Non-interactively in CI, on a schedule and on any change to the agent's configuration. Some teams prefer an offline run on a fixed cadence instead. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- **Gating.** A configuration change that drops the pass rate is reviewed before it merges; the pass-rate threshold is a merge check. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- **Growing it.** Every production incident gets an eval, written by the team that owned the incident, and stays as a regression test. So do vulnerability classes found by scheduled security scans. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- **Decay.** The suite is live: as models improve, cases that used to separate good from bad stop doing so, and new cases from monitoring must replace them. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- **Cost.** Each eval run calls the model, so it needs an API key with its own budget. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- Measured by the pass rate over time, how long an incident takes to become an eval, and regressions caught in CI vs found in production. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- **Building the suite.** A platform engineer collects 20–50 real tasks from recent work with their expected or accepted outcomes. Each becomes an eval: the prompt, plus checks such as tests pass, lint clean, behaviour unchanged, policy followed. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- **When it runs.** Non-interactively in CI, on a schedule and on any change to `CLAUDE.md`, skills, or hooks. Depending on the use case, some teams run evals offline on a set cadence instead of on every change. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- **Gating.** A skill or other configuration change that drops the pass rate gets reviewed before it merges; the pass-rate threshold is enforced as a merge check, and the team that owns the change approves it. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- **Growing it.** Every production incident gets an eval, written by the team that owned the incident, and stays as a regression test. When a fix for a vulnerability found by a scheduled security scan reaches production, an eval for that vulnerability class is added too. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- **Decay.** The suite is live: as models improve, cases that used to discriminate (separate good from bad output) stop doing so, and new cases arising from monitoring must be added. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- **Prerequisites and cost.** A `CLAUDE.md` and a feedback loop first; then CI that can run Claude Code non-interactively and an API key with budget for eval runs. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- **Measuring it.** Leading: the pass rate over time and how long an incident takes to become a permanent eval. Lagging: regressions caught in CI vs regressions found in production. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+
+### The playbook's example workflow
+
+A GitHub Actions workflow (`.github/workflows/agent-evals.yml`) runs on pull requests that touch `CLAUDE.md` or `.claude/**` and nightly (`cron: '0 2 * * *'`, 02:00 UTC). For each `evals/*.json` file it runs `claude -p "<prompt>" --allowedTools "Read,Edit,Bash(make test)" --output-format json` and passes the result to a `check.sh` script. (src: [[2026-11-24-ai-native-sdlc-playbook]]) The `--allowedTools` list matters: a `claude -p` run with no permission mode starts in Manual (`default`) mode, where tool calls that would need approval are denied unless an allow rule, hook, or auto mode approves them. (general knowledge; verified: [Choose a permission mode](https://code.claude.com/docs/en/permission-modes), [Run Claude Code programmatically](https://code.claude.com/docs/en/headless))
 
 ### Evals vs the agent's own checks
 

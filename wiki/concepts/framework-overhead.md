@@ -3,7 +3,7 @@ type: concept
 tags: [metering-billing]
 sources: [2026-11-10-deep-learning-brrrr-first-principles]
 created: 2026-11-10
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Framework overhead
@@ -12,7 +12,7 @@ updated: 2026-11-22
 
 ## Details
 
-- Scale: an [[nvidia-a100]] does 312 TFLOPS, while Python does ~32 million additions/sec. In the time Python does 1 operation, the A100 could do ~9.75 million FLOPs. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
+- Scale: an [[nvidia-a100]] does 312 TFLOPS, while Python does ~32 million additions/sec (the author's local benchmark). In the time Python does 1 operation, the A100 could do ~9.75 million FLOPs. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - PyTorch adds dispatch layers on top: ~280K ops/sec on tiny tensors. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - What `a + b` costs before any math: Python looks up `__add__` → PyTorch inspects the tensor (dtype, device, autograd) to choose a kernel → PyTorch launches the kernel. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 
@@ -32,7 +32,7 @@ Profiler trace: CPU-side `aten::cos` calls (top) and the GPU kernels they launch
 ![[raw/assets/brrr-no_overhead.png]]
 Healthy trace: the CPU runs far ahead of the GPU, so the GPU stays continuously busy. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 
-- Fixes, which trade away flexibility: tracing (`jit.trace`, `FX`, `jax.jit`), CUDA Graphs (record a sequence of GPU launches and replay it), or a VM-level JIT like TorchDynamo. Also [[operator-fusion]] and avoiding Python. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
+- Fixes: tracing (`jit.trace`, `FX`, `jax.jit`) or CUDA Graphs (record a sequence of GPU launches and replay it), which trade away flexibility; the author hoped a JIT working at the Python VM (bytecode) level, TorchDynamo, could keep both. Also [[operator-fusion]] and avoiding Python. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 
 ## Why it matters for a GPU cloud
 

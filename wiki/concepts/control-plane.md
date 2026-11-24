@@ -16,13 +16,14 @@ The **control plane** is the part of a system that *decides and manages*; the **
 
 - In [[kubernetes]], the control plane manages every [[kubernetes-node|Node]], and it automatically [[kubernetes-scheduling|schedules]] [[kubernetes-pod|Pods]] across Nodes based on each Node's available resources. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - On each Node, the [[kubelet]] is the control plane's point of contact: it communicates between the control plane and the Node and manages that Node's Pods. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
-- Its parts (general knowledge):
-  - **API server:** the front door. Every request, from [[kubectl]] or anything else, goes through its REST API. The tutorial's proxy URL `/api/v1/namespaces/default/pods/...` is a path on this API (path: src).
-  - **etcd:** the database holding the cluster's desired and current state.
-  - **Scheduler:** picks a Node for each new Pod.
-  - **Controller manager:** runs controllers (e.g. for [[kubernetes-deployment|Deployments]] and [[kubernetes-replicaset|ReplicaSets]]) that keep comparing desired state to actual state and fixing the difference. This loop is called **reconciliation**.
-- Reconciliation in action: the tutorial runs `kubectl scale --replicas=4`, and `get` then shows the ReplicaSet's DESIRED at 4 and new Pods appearing ([[kubernetes-scaling]]). (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]) Under the hood, `scale` only records a new desired count in the Deployment's `.spec.replicas`; the Deployment controller passes it to the ReplicaSet, whose controller creates Pods until CURRENT matches. (general knowledge)
-- The Nodes, kubelets, and containers doing the work are the data plane. (general knowledge)
+- Its parts (general knowledge; verified: [Kubernetes Components](https://kubernetes.io/docs/concepts/overview/components/)):
+  - **API server (kube-apiserver):** the front door. Every request, from [[kubectl]], the kubelets, or the other components, goes through its HTTP API. The tutorial's proxy URL `/api/v1/namespaces/default/pods/...` is a path on this API (path: src: [[2026-11-22-k8s-viewing-pods-and-nodes]]).
+  - **etcd:** a consistent, highly available key-value store holding all API data, i.e. every object's desired state (spec) and last reported state (status).
+  - **Scheduler (kube-scheduler):** picks a Node for each new Pod ([[kubernetes-scheduling]]).
+  - **Controller manager (kube-controller-manager):** runs controllers (e.g. for [[kubernetes-deployment|Deployments]], [[kubernetes-replicaset|ReplicaSets]], and Node health) that keep comparing desired state to actual state and fixing the difference. This loop is called **reconciliation**.
+  - **cloud-controller-manager** (optional): integrates with a cloud provider's APIs, e.g. for load balancers and VM-backed Nodes.
+- Reconciliation in action: the tutorial runs `kubectl scale deployments/kubernetes-bootcamp --replicas=4`; `kubectl get deployments` then shows 4 instances available and `kubectl get pods -o wide` shows 4 Pods ([[kubernetes-scaling]]). (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]) Under the hood, `scale` only records a new desired count in the Deployment's `.spec.replicas`; the Deployment controller passes it to the ReplicaSet, whose controller creates Pods until the running count matches. (general knowledge)
+- The Nodes, kubelets, and containers doing the work are often called the data plane; Kubernetes' own docs call these the worker Nodes and node components. (general knowledge)
 
 ### Level 2: a GPU cloud's control plane
 

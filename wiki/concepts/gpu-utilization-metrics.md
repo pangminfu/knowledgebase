@@ -14,14 +14,14 @@ Numbers meant to say how "busy" a GPU is. They measure very different things. **
 
 | Metric | What it measures | Source |
 | --- | --- | --- |
-| `nvidia-smi` GPU-Util | % of time a GPU kernel is running | src: [[2026-11-10-deep-learning-brrrr-first-principles]] |
+| `nvidia-smi` GPU-Util | % of the sample period (1 s to 1/6 s, product-dependent) in which one or more kernels was executing | src: [[2026-11-10-deep-learning-brrrr-first-principles]]; general knowledge; verified: [NVML nvmlUtilization_t](https://docs.nvidia.com/deploy/nvml-api/latest/api/structnvmlUtilization__t.html) |
 | Achieved FLOPS ÷ peak FLOPS | Share of compute capacity actually used; 80% ⇒ at least 80% compute-bound | src: [[2026-11-10-deep-learning-brrrr-first-principles]] |
 | Achieved bandwidth ÷ peak bandwidth | Share of [[memory-bandwidth]] used | src: [[2026-11-10-deep-learning-brrrr-first-principles]] (microbenchmark) |
-| MFU (model FLOPS utilization) | FLOPS % of peak for a whole training run | general knowledge |
-| DCGM counters (SM activity, Tensor Core activity, etc.) | Finer-grained hardware activity | general knowledge |
+| MFU (model FLOPS utilization) | FLOPs the model needs per second (excluding recomputation) ÷ peak FLOPS, for a training run | general knowledge; verified: [PaLM paper, App. B](https://arxiv.org/abs/2204.02311) |
+| DCGM profiling counters: `DCGM_FI_PROF_GR_ENGINE_ACTIVE`, `DCGM_FI_PROF_SM_ACTIVE`, `DCGM_FI_PROF_SM_OCCUPANCY`, `DCGM_FI_PROF_PIPE_TENSOR_ACTIVE`, `DCGM_FI_PROF_DRAM_ACTIVE` | Fraction of time/cycles the graphics engine, the SMs (streaming multiprocessors, the GPU's compute blocks), Tensor Core pipes, and memory interface are active, averaged over an interval. SM_ACTIVE counts how many SMs are busy, so a kernel using 1/5 of the SMs for the whole interval scores 0.2 | general knowledge; verified: [DCGM Feature Overview](https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/feature-overview.html) |
 
 - GPU-Util is a good way to eyeball [[framework-overhead]]: gaps between kernels show up as lower util. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
-- GPU-Util can't distinguish a kernel using the whole chip from one barely using it. A memory-bound kernel counts as 100% busy. (general knowledge; follows from the definition in src)
+- GPU-Util can't distinguish a kernel using the whole chip from one barely using it. A kernel occupying a single SM, or a memory-bound kernel, still counts as 100% busy. (general knowledge; follows from the NVML definition above)
 - Naming trap: the source stresses the column is "GPU-Util", **not** "Volatile GPU-Util". In `nvidia-smi`'s two-line header, "Volatile Uncorr. ECC" (an error counter) sits directly above "GPU-Util" in the same cell, so the two are easy to read as one label. (src: [[2026-11-10-deep-learning-brrrr-first-principles]]; layout explanation: general knowledge)
 - LLM serving makes this concrete: a single-request decode is memory-bandwidth-bound by construction, so every kernel runs, util reads high, and achieved FLOPS sits far below peak. See [[inference-batching]]. (src: [[2026-11-12-transformer-inference-arithmetic]])
 

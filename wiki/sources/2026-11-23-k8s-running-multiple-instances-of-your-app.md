@@ -6,7 +6,7 @@ raw: raw/2026-11-23-k8s-running-multiple-instances-of-your-app.md
 url: https://kubernetes.io/docs/tutorials/kubernetes-basics/scale/scale-intro/
 author: Kubernetes documentation (kubernetes.io)
 created: 2026-11-23
-updated: 2026-11-23
+updated: 2026-11-24
 ---
 
 # Running Multiple Instances of Your App (Kubernetes Basics, Module 5)
@@ -55,7 +55,7 @@ After scaling to 4: the Pods are spread over all three Nodes (10.0.0.5; 10.0.2.4
 
 (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
 
-- A ReplicaSet's name is `[DEPLOYMENT-NAME]-[RANDOM-STRING]`, where the string is generated using the **pod-template-hash** as a seed. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
+- A ReplicaSet's name is `[DEPLOYMENT-NAME]-[RANDOM-STRING]`, where the string is generated using the **pod-template-hash** as a seed. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]) Correction: the suffix is the pod-template-hash itself, a deterministic hash of the Pod template, not a random string; see [[kubernetes-replicaset#Contradictions]]. (general knowledge; verified: [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment))
 - After scaling, `kubectl get pods -o wide` shows 4 Pods with different IPs. `kubectl describe deployments/<name>` records the change in the Deployment's events. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
 - Scaling down to 2 with the same `scale` command terminates 2 Pods. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
 - All commands: [[kubectl]].
@@ -73,7 +73,7 @@ After scaling to 4: the Pods are spread over all three Nodes (10.0.0.5; 10.0.2.4
 
 ## Questions raised
 
-- How does the Horizontal Pod Autoscaler work, which metrics can it scale on, and can it scale to zero? (Next: Kubernetes autoscaling docs.)
+- How does the Horizontal Pod Autoscaler work, which metrics can it scale on, and can it scale to zero? Partly answered in [[kubernetes-scaling]] (scale-to-zero is beta and on by default since v1.37).
 - When scaling down, which Pods does the ReplicaSet pick to terminate, and how do in-flight requests (e.g. long streamed LLM responses) finish cleanly?
 - What happens to a scale-up blocked by a tenant's ResourceQuota, compared with one blocked by a lack of free GPUs?
 - How does a GPU cloud add Nodes when replicas are Pending (cluster autoscaler, bare-metal provisioning), and how long does that take?

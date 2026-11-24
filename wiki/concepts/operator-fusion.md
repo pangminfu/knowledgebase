@@ -21,9 +21,9 @@ Fused: one read, all three transforms on-chip, one write. (src: [[2026-11-10-dee
 - `x.cos().cos()` unfused = 4 global memory reads/writes; fused = 2, so about 2× faster. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - Requirements: the system has to know the upcoming ops in advance, which rules out PyTorch's default **eager mode** (run one op at a time). It also has to generate GPU (CUDA) code. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - Beyond simple pointwise chains: pointwise ops can be fused onto reductions or onto matmuls. A matmul itself can be seen as a fused broadcast-multiply plus a reduction. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
-- Tools: NVFuser and XLA do simple fusions automatically. Triton is suggested for writing custom fused kernels. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
+- Tools (as of 2022): NVFuser and XLA do simple fusions automatically. Triton is suggested for writing custom fused kernels. (src: [[2026-11-10-deep-learning-brrrr-first-principles]]) Since PyTorch 2.0, `torch.compile` (TorchDynamo + the TorchInductor compiler, which generates Triton kernels) is PyTorch's built-in fusing compiler. (general knowledge; verified: [PyTorch 2.0 announcement](https://pytorch.org/get-started/pytorch-2.0/))
 - Consequences: fused `x.cos().cos()` ≈ cost of `x.cos()`, which is why `gelu` costs about the same as `relu`. Recomputing values instead of storing them (rematerialization / activation checkpointing) can reduce *both* memory and runtime. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
-- Helps both bandwidth-bound and overhead-bound workloads, since fewer kernels also means fewer launches. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
+- Listed as a fix for both bandwidth-bound and overhead-bound workloads. (src: [[2026-11-10-deep-learning-brrrr-first-principles]]) For overhead, the reason is that fewer kernels means fewer launches and less dispatch. (general knowledge)
 
 ## How much memory-bound time remains
 

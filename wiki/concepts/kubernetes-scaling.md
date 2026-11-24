@@ -44,10 +44,10 @@ The same loop replaces Pods lost to a Node failure. A lost Pod and a scale-up bo
 | | Who sets the replica count | Example |
 | --- | --- | --- |
 | Manual | A person or script | `kubectl scale deployments/<name> --replicas=4` (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]) |
-| Autoscaling | A controller, based on metrics | Kubernetes supports Pod autoscaling (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]). The built-in **Horizontal Pod Autoscaler (HPA)** adjusts replicas from CPU or custom metrics, between a min and a max (general knowledge) |
+| Autoscaling | A controller, based on metrics | Kubernetes supports Pod autoscaling (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]). The built-in **Horizontal Pod Autoscaler (HPA)** adjusts replicas from resource metrics (CPU, memory), custom, or external metrics, between `minReplicas` (default 1) and `maxReplicas`. It re-evaluates every 15 s by default and waits a 300 s stabilization window before scaling down. (general knowledge; verified: [Horizontal Pod Autoscaling](https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/)) |
 
 - An autoscaler does nothing new. It writes the same replica field you would set by hand. (general knowledge)
-- Related autoscalers, all general knowledge: the **cluster autoscaler** adds or removes *Nodes* when Pods are Pending or Nodes sit empty. **KEDA** scales on event and queue metrics and can scale to zero. The stock HPA keeps at least one replica unless an alpha feature is enabled.
+- Related autoscalers, all general knowledge: the **cluster autoscaler** adds or removes *Nodes* when Pods are Pending or Nodes sit empty. **KEDA** scales on event and queue metrics and can scale to zero. The HPA can use `minReplicas: 0` only with the `HPAScaleToZero` feature gate: alpha (off) since v1.16, beta and on by default since v1.37; it also needs at least one Object or External metric, since a Pod-based metric cannot be measured with zero Pods. (verified: [kube_features.go v1.37.0](https://github.com/kubernetes/kubernetes/blob/v1.37.0/pkg/features/kube_features.go))
 
 ## GPU cloud bridge
 
@@ -74,6 +74,6 @@ General knowledge, not from the source.
 
 ## Open questions
 
-- HPA details: metric sources (custom/external metrics), stabilization windows, and scale-to-zero support. Needs the Kubernetes autoscaling docs.
+- HPA details beyond the defaults above: custom/external metric pipelines (metrics adapters) and tuning `behavior` policies for GPU-backed replicas.
 - Which Pods does a ReplicaSet terminate first on scale-down, and how can an inference platform influence that choice?
 - How do LLM-specific autoscalers (e.g. KServe, KEDA with queue metrics, provider-built ones) decide when to add GPU replicas?

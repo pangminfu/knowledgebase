@@ -3,7 +3,7 @@ type: concept
 tags: [lifecycle]
 sources: [2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app]
 created: 2026-11-23
-updated: 2026-11-23
+updated: 2026-11-24
 ---
 
 # ReplicaSet (Kubernetes)
@@ -14,7 +14,7 @@ A **ReplicaSet** is the [[kubernetes]] object that keeps a fixed number of ident
 
 - When Pods are lost (e.g. a [[kubernetes-node|Node]] dies), the ReplicaSet drives the cluster back to the desired state by creating new Pods. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
 - `kubectl get rs` shows **DESIRED**, the replica count set on the Deployment (the desired state), and **CURRENT**, how many replicas are running. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]) It also shows a READY column. (general knowledge)
-- Its name is `[DEPLOYMENT-NAME]-[RANDOM-STRING]`, with the string generated using the **pod-template-hash** as a seed. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]) The hash comes from the Pod template, so changing the template (e.g. a new image) produces a new ReplicaSet with a different suffix. (general knowledge)
+- The tutorial says its name is `[DEPLOYMENT-NAME]-[RANDOM-STRING]`, with the string generated using the **pod-template-hash** as a seed. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]) More precisely, the suffix *is* the `pod-template-hash` value: a hash of the Pod template, not a random string, so changing the template (e.g. a new image) produces a new ReplicaSet with a different suffix. See Contradictions. (general knowledge; verified: [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment))
 - **Reading a Pod name:** `kubernetes-bootcamp-644c5687f4-wp67j` is Deployment name + ReplicaSet hash + a per-Pod random suffix. (Pod name: src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]; breakdown: general knowledge)
 - Scaling a Deployment ([[kubernetes-scaling]]) changes its ReplicaSet's desired count. The ReplicaSet does the actual creating and terminating. (src for scaling via replicas: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]; division of labour: general knowledge)
 - How it finds "its" Pods (general knowledge): through a [[kubernetes-labels-and-selectors|label selector]] that includes the `pod-template-hash` label, plus an owner reference on each Pod pointing back to the ReplicaSet.
@@ -43,6 +43,10 @@ flowchart LR
 - [[kubernetes-pod]]: what a ReplicaSet creates and replaces.
 - [[kubernetes-labels-and-selectors]]: how a ReplicaSet identifies its Pods.
 - [[control-plane]]: its controller is one of the reconciliation loops in the controller manager.
+
+## Contradictions
+
+- **Is the ReplicaSet suffix random?** The tutorial calls it a "random string ... [that] uses the pod-template-hash as a seed" (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]). The Deployments concept doc says the name is `[DEPLOYMENT-NAME]-[HASH]`, and the same value appears as the `pod-template-hash` label on the ReplicaSet and its Pods; it is deterministic for a given template. (general knowledge; verified: [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#pod-template-hash-label))
 
 ## Open questions
 

@@ -56,7 +56,9 @@ wiki/syntheses/      Filed answers to queries: comparisons, analyses, explanatio
 - **Citations:** every non-trivial claim in concept, entity, overview, and synthesis
   pages cites the source page it came from, e.g. `(src: [[2026-11-10-attention-paper]])`.
   Never state something as sourced if it came from your own background knowledge;
-  mark that `(general knowledge)` instead.
+  mark that `(general knowledge)` instead. When such a claim was checked against an
+  authoritative online page (official docs, spec sheet, original paper), cite it as
+  `(general knowledge; verified: [<title>](<url>))`.
 - **Contradictions:** when sources disagree, never silently overwrite. Keep both claims
   with citations under a `## Contradictions` section on the affected page.
 - **Images:** when a source image carries meaning (architecture diagram, workflow, chart,

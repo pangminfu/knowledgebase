@@ -41,7 +41,7 @@ A Service (`svc`, IP 1.1.1.1) with selector `app=A` sends traffic to every Pod l
 | **LoadBalancer** | Outside, via a fixed external IP | The cloud creates an external load balancer (if supported) | Superset of NodePort |
 | **ExternalName** | n/a | Returns a DNS `CNAME` to the `externalName` value; no proxying | Separate |
 
-(src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
+(src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]]) Precision on NodePort: the reference doc says every Node proxies the allocated port, using the same port number on every Node. (general knowledge; verified: [Service](https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport))
 
 - **Services without a selector** do not get a corresponding Endpoints object, so you can map the Service to specific endpoints by hand. ExternalName Services also have no selector. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
 

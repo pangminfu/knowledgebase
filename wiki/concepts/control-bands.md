@@ -18,7 +18,7 @@ General knowledge.
 
 - **Mean:** the average value. **Standard deviation (σ, "sigma"):** how far values typically sit from the mean. **Rolling window:** compute both over the last N days, so the baseline follows normal change.
 - For roughly normally distributed data, about 68% of points fall within 1σ of the mean, 95% within 2σ, and 99.7% within 3σ. A 3σ point is rare enough to be a real signal.
-- **Western Electric rules** come from factory quality control (control charts, 1950s). Besides "one point beyond 3σ", they flag patterns such as 2 of 3 points beyond 2σ on one side, 4 of 5 beyond 1σ, or 8 in a row on one side of the mean. Those catch slow drift, not just spikes.
+- **Western Electric (WECO) rules** come from industrial quality control (the Western Electric *Statistical Quality Control Handbook*, 1956). They flag a process as out of control on: (1) any one point beyond 3σ; (2) 2 of the last 3 points beyond 2σ on the same side; (3) 4 of the last 5 points beyond 1σ on the same side; (4) 8 consecutive points on the same side of the mean. Rules 2–4 catch slow drift and shifts, not just spikes. (verified: [NIST/SEMATECH e-Handbook, 6.3.2 (WECO rules)](https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc32.htm))
 
 ### Tiered response
 
@@ -50,12 +50,13 @@ tiers:
 
 1. Pick one metric with a stable rolling baseline, such as CI test failure rate, post-deploy 5xx (server error) rate, or PR cycle time. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 2. Write the detection script: rolling mean and σ plus Western Electric (or similar) rules. It is version-controlled, unit-tested, and **fully deterministic, with no model involved**. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-3. Trigger the agent from a scheduled CI workflow, a monitoring webhook, or an in-network cron job. The agent runs stateless and non-interactive, so a loop can start and finish without anyone starting it. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-4. The agent writes its diagnosis as an `intent.md` (anomaly, evidence, proposed outcome, affected systems, open questions), which enters the [[artifact-chain]] at Plan. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-5. The service owner or on-call engineer triages: fix now, schedule, or dismiss. Dismissals tune the bands to cut noise. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+3. Trigger the agent from a scheduled GitHub or GitLab workflow, a webhook from the existing monitoring stack, or a cron job inside the network. Claude runs stateless, as a non-interactive step on a CI runner or as an Agent SDK service in a sandboxed container, so a loop can begin and end without anyone starting it. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+4. The agent writes its diagnosis as an `intent.md` in the Plan-stage format (the anomaly and its evidence, proposed outcome, affected systems, open questions), which enters the [[artifact-chain]] like any other intent. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+5. The service owner or on-call engineer triages the queue, routing product-facing findings to the product owner: fix now, schedule, or dismiss. Dismissals tune the bands to cut noise. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 6. When a fix ships, the incident becomes a permanent [[evals|eval]] case. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
-- Examples: CI failure rate past 3σ → quarantine the flaky test or open a revert PR. Post-deploy 5xx past 3σ with a deploy in the window → trigger the existing rollback pipeline. PR cycle time drifting → write a report for engineering leadership, which shows the same machinery works for process metrics. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- Examples: CI failure rate past 3σ → quarantine the flaky test or open a revert PR, and the review gate decides. Post-deploy 5xx past 3σ with a deployment in the window → trigger the existing rollback pipeline. PR cycle time trips a drift rule → write a report for engineering leadership, which shows the same machinery works for process metrics. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- Governance: tier boundaries come from version-controlled config, with permissions and managed settings denying production access; invocations, findings, and triage decisions are logged with timestamps; runbooks the agent may trigger are approved in advance. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 - Measured by time from breach to an `intent.md` in the triage queue, the share of findings that become merged fixes, and whether repeat incidents of the same class fall. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 ### Why detection stays deterministic

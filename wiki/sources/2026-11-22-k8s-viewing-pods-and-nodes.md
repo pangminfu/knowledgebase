@@ -6,7 +6,7 @@ raw: raw/2026-11-22-k8s-viewing-pods-and-nodes.md
 url: https://kubernetes.io/docs/tutorials/kubernetes-basics/explore/explore-intro/
 author: Kubernetes documentation (kubernetes.io)
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Viewing Pods and Nodes (Kubernetes Basics, Module 3)
@@ -15,7 +15,7 @@ Raw: [[raw/2026-11-22-k8s-viewing-pods-and-nodes]] · Official [[kubernetes]] tu
 
 ## Summary
 
-The page introduces the two basic building blocks of a Kubernetes cluster. A [[kubernetes-pod|Pod]] is a group of one or more [[container|containers]] that share an IP address, port space, and storage volumes, and are always placed together on one machine. Pods are the smallest unit Kubernetes schedules: you never create containers directly, a [[kubernetes-deployment|Deployment]] creates Pods. A [[kubernetes-node|Node]] is a worker machine, virtual or physical, that runs Pods. The [[control-plane]] manages every Node and [[kubernetes-scheduling|schedules]] Pods onto Nodes based on each Node's available resources. Every Node runs a [[kubelet]] (the control plane's agent on the machine) and a container runtime such as [[containerd]]. The second half is a hands-on [[kubectl]] walkthrough: `get`, `describe`, `logs`, `exec`, and `kubectl proxy`.
+The page introduces the two basic building blocks of a Kubernetes cluster. A [[kubernetes-pod|Pod]] is a group of one or more [[container|containers]] that share an IP address, port space, and storage volumes, and are always placed together on one machine. Pods are the smallest unit Kubernetes schedules: you never create containers directly, a [[kubernetes-deployment|Deployment]] creates Pods. A [[kubernetes-node|Node]] is a worker machine, virtual or physical, that runs Pods. The [[control-plane]] manages every Node and [[kubernetes-scheduling|schedules]] Pods onto Nodes based on each Node's available resources. Every Node runs a [[kubelet]] (the control plane's agent on the machine) and a container runtime such as [[containerd]]. The second half is a hands-on [[kubectl]] walkthrough of `get`, `describe`, `exec`, and `kubectl proxy`; `logs` is listed but not demonstrated.
 
 **Why a control-plane engineer should care:** in a GPU cloud, a Node is usually a bare-metal GPU server and a Pod is one workload on it, for example one inference replica holding some of that server's GPUs. Placing Pods on Nodes, replacing them when a Node dies, and tracking how long each one held its GPUs are the lifecycle, quota, and metering jobs this wiki is about. (general knowledge)
 
@@ -48,7 +48,7 @@ One Node (the hexagon) running the same four Pods. The strip along the Node's ed
 - Four common subcommands: `kubectl get` (list resources), `kubectl describe` (detailed information), `kubectl logs` (a container's logs), `kubectl exec` (run a command in a container). Together they show when apps were deployed, their status, where they run, and their configuration. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - `kubectl describe pods` shows a Pod's containers, IP address, ports, and a list of **events** in the Pod's lifecycle. `describe` works on most objects (Nodes, Pods, Deployments). Its output is for humans and should not be parsed by scripts. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - Pods live on an isolated, private network. `kubectl proxy` opens a local tunnel (port 8001) to the cluster's API, and a Pod can then be reached at `/api/v1/namespaces/default/pods/<pod>:8080/proxy/`. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
-- With one container in a Pod, `exec` and `logs` need no container name. `kubectl exec -ti <pod> -- bash` opens a shell inside the container. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
+- With one container in a Pod, the container name can be left out (the tutorial notes this for the proxy URL and for `exec`). `kubectl exec -ti <pod> -- bash` opens a shell inside the container. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - Full command reference: [[kubectl]].
 
 ## Takeaways

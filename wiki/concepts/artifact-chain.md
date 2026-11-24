@@ -18,7 +18,7 @@ An **artifact chain** is a way of running the [[software-development-lifecycle]]
 | --- | --- | --- | --- |
 | `intent.md`: problem, proposed outcome, affected users/systems, constraints, open questions | The originator with Claude, or a monitoring agent | Product owner (merge = accept, closed review = reject) | The requirements & design pass |
 | `spec.md`: requirements and design, with flagged policy conflicts | Claude, constrained by policy skills | Product owner; tech lead for higher-risk changes | Plan mode |
-| `plan.md`: files that change, order of work, risks, proof (tests) | Claude in plan mode, interviewed by the engineer | Engineer; tech lead/architect for higher risk | Implementation |
+| `plan.md`: files that change, order of work, risks, proof (tests) | Claude in plan mode, interviewing the engineer | Engineer; tech lead/architect for higher risk | Implementation |
 | Diff and tests | Claude | Code owner, through PR review | The CI/CD pipeline on merge |
 | PR with review findings | Agentic review passes + humans | Code owner (branch protection) | Deploy, up to the production gate |
 | Incident record / new `intent.md` | Agent after a [[control-bands\|control-band]] breach | Service owner triages | The next loop |
@@ -33,7 +33,7 @@ An **artifact chain** is a way of running the [[software-development-lifecycle]]
 
 ### Measuring with git timestamps
 
-Because every handoff is a commit, process metrics come straight from git: intent→spec time, spec→plan time, spec commits made after the plan started (rework), and how often the merged diff still matches `plan.md`. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+Because every handoff is a commit, process metrics come straight from git: intent→spec time, spec commits made after the first `plan.md` (rework), plan-approval→merged-PR time, and how often the merged diff still matches `plan.md`. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 ### Coexisting with existing tools
 
@@ -42,7 +42,7 @@ Organizations already keep these records in Jira, ServiceNow, requirements tools
 | Option | Authoritative record | How the other side stays in sync |
 | --- | --- | --- |
 | Repo is the source of truth | The markdown files | The legacy tool links to commits |
-| Legacy tool is the source of truth | Jira / ServiceNow / requirements tool | Claude reads the record at session start and writes back through MCP |
+| Legacy tool is the source of truth | Jira / ServiceNow / requirements tool | Claude reads the record at session start and writes back through [[claude-code#Features the playbook uses\|MCP]] (a standard way to connect agents to other systems) |
 | Linkage (minimum bar) | Both (accepted as two sources) | Every artifact notes the record ID; every record holds the commit SHA |
 
 (src: [[2026-11-24-ai-native-sdlc-playbook]])

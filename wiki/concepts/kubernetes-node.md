@@ -3,7 +3,7 @@ type: concept
 tags: [lifecycle, provisioning, tenancy-quotas]
 sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app]
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Node (Kubernetes)
@@ -34,7 +34,7 @@ All general knowledge; not from the source.
 - **A GPU Node is usually a bare-metal server** with 8 GPUs connected by NVLink (e.g. an 8× [[nvidia-a100]] box). GPU clouds often skip the VM layer so customers get full GPU and network performance.
 - **Extra software on GPU Nodes:** the NVIDIA driver, the NVIDIA container toolkit (so [[containerd]] can hand GPUs to containers), and the **device plugin**, which tells kubelet "this Node has 8 `nvidia.com/gpu`", so the scheduler can count them. The NVIDIA GPU Operator installs all of this, plus a DCGM metrics exporter ([[gpu-utilization-metrics]]).
 - **Node lifecycle is the bare-metal half of the lifecycle domain:** rack and image the server, install drivers, run health checks ([[nvidia-smi]], burn-in tests), join it to the cluster, and later *cordon* (stop new Pods), *drain* (evict existing Pods), repair, and return it. A single bad GPU can take a whole 8-GPU Node out of service.
-- **Node shape decides what fits.** A model that needs 4 GPUs on one NVLink domain can only run on Nodes with 4 free, connected GPUs ([[model-parallelism]], [[gpu-memory-capacity]]).
+- **Node shape decides what fits.** A model that needs 4 GPUs on one NVLink domain (the set of GPUs wired to each other by NVLink, NVIDIA's fast GPU-to-GPU link) can only run on Nodes with 4 free GPUs, ideally connected ones; picking a connected set needs topology-aware allocation ([[model-parallelism]], [[gpu-memory-capacity]]).
 - **Tenancy:** customers needing hard isolation often get whole dedicated Nodes, so no other tenant's Pods share their machine.
 
 ## Related

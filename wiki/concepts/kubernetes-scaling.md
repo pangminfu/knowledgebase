@@ -37,7 +37,7 @@ The same loop replaces Pods lost to a Node failure. A lost Pod and a scale-up bo
 ### Traffic follows automatically
 
 - A [[kubernetes-service|Service]] load-balances across all Pods of an exposed Deployment. It continuously monitors running Pods through **endpoints**, so new replicas receive traffic and terminated ones stop receiving it. The Service itself does not change. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
-- Multiple replicas are what make rolling updates possible without downtime. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
+- Multiple replicas make rolling updates without downtime easier: the tutorial says that with several instances "you would be able to do Rolling updates without downtime". (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]) A single replica can also update without downtime under the default surge setting, but has no spare capacity during the swap. (general knowledge)
 
 ### Manual vs automatic
 

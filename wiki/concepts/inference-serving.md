@@ -3,12 +3,12 @@ type: concept
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
 sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-22-training-vs-inference, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app]
 created: 2026-11-21
-updated: 2026-11-23
+updated: 2026-11-24
 ---
 
 # Inference serving
 
-**Serving** is everything required to turn [[llm-inference]] (the computation) into a reliable production service that applications can call. Analogy: inference is the kitchen cooking one dish. Serving is the restaurant around it: taking orders, seating guests, deciding which orders cook together, adding cooks at rush hour, and handing out the bill. For a GPU cloud, most of the serving list is control-plane work. (src: [[2026-11-21-what-is-llm-inference]])
+**Serving** is everything required to turn [[llm-inference]] (the computation) into a reliable production service that applications can call. (src: [[2026-11-21-what-is-llm-inference]]) Analogy: inference is the kitchen cooking one dish. Serving is the restaurant around it: taking orders, seating guests, deciding which orders cook together, adding cooks at rush hour, and handing out the bill. For a GPU cloud, most of the serving list is control-plane work. (general knowledge)
 
 ## Details
 
@@ -31,7 +31,7 @@ The handbook gives the list; the mapping below is this wiki's (general knowledge
 | Model loading and version management | Lifecycle | Platform orchestrates, framework loads | Where weights are stored, cold-start time, rolling upgrades between model versions |
 | Health checks | Lifecycle | Both | Restarting failed replicas, draining bad GPUs/nodes ([[nvidia-smi]]) |
 | Autoscaling | Lifecycle; metering-billing | Platform | Scale on which signal (queue depth, tokens/sec, latency), min/max replicas, who pays for idle replicas. Mechanism and GPU pitfalls: [[kubernetes-scaling]] |
-| Load balancing across replicas | Provisioning; lifecycle | Platform | Routing policy. A Kubernetes [[kubernetes-service|Service]] gives basic per-connection balancing; cache-aware routing matters once replicas hold different prefixes ([[inference-optimization]]) |
+| Load balancing across replicas | Provisioning; lifecycle | Platform | Routing policy. A Kubernetes [[kubernetes-service\|Service]] gives basic per-connection balancing; cache-aware routing matters once replicas hold different prefixes ([[inference-optimization]]) |
 | Request queuing and scheduling | Tenancy-quotas | Both: framework schedules within a replica, platform queues across tenants | Per-tenant rate limits, priority, fairness, what happens when a queue is full |
 | Batching across concurrent requests | Tenancy-quotas; metering-billing | Framework | Tenants share a batch, so isolation and per-tenant accounting are required ([[inference-batching]]) |
 | Observability | Metering-billing; lifecycle | Both | Per-tenant token counts for billing, latency/throughput SLOs, GPU metrics ([[gpu-utilization-metrics]]) |

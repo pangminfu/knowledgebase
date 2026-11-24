@@ -3,7 +3,7 @@ type: concept
 tags: [provisioning, tenancy-quotas, metering-billing]
 sources: [2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-12
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # GPU memory capacity
@@ -13,8 +13,8 @@ updated: 2026-11-22
 ## Details
 
 - Three occupants of GPU memory during inference: **weights** (the model's parameters), the **kv cache** (one entry per token in flight), and **intermediate activations** (temporaries). The source treats the third as negligible at these sizes. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- Weights at 16-bit precision: parameters × 2 bytes. A 52B model is 104 GB, so it does **not** fit on a 40 GB [[nvidia-a100]] — three GPUs minimum, four in practice, since splitting powers of two over three chips wastes capacity. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- The leftover after weights is the cache budget. Four A100-40GB = 160 GB, minus 104 GB of weights, leaves 56 GB ≈ 23,000 cached tokens (2 MB each) — e.g. 4 concurrent requests of 2048 tokens. Three GPUs leave 16 GB ≈ 8,000 tokens, e.g. batch 4 × 2048. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Weights at 16-bit precision: parameters × 2 bytes. A 52B model is 104 GB, so it does **not** fit on a 40 GB [[nvidia-a100]] — three GPUs minimum, four in practice: the source calls dividing powers of two over three GPUs "silly", since model dimensions split evenly over 4. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- The leftover after weights is the cache budget. Four A100-40GB = 160 GB, minus 104 GB of weights, leaves 56 GB. The source prints "≈ 23,000" cached tokens, but 56 GB ÷ 2 MB (0.002 GB) ≈ **28,000** (arithmetic check, this wiki) — about 13 concurrent requests of 2048 tokens. Three GPUs leave 16 GB ≈ 8,000 tokens, i.e. batch 4 × 2048. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - So for a fixed model and GPU count, **max concurrency is a memory calculation**: `(total VRAM − weights − overhead) ÷ bytes per cached token ÷ context length`. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - Memory is why replicas exist at all. If traffic exceeds one replica's batch capacity, you add replicas (more GPUs) rather than growing the batch indefinitely. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - The post notes the 80 GB A100 variant was not offered by large clouds at the time (2022), so capacity was effectively capped at 40 GB per GPU. (src: [[2026-11-12-transformer-inference-arithmetic]])

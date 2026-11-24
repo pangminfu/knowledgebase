@@ -3,7 +3,7 @@ type: concept
 tags: [provisioning, lifecycle]
 sources: [2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-12
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Model parallelism
@@ -31,7 +31,7 @@ updated: 2026-11-22
 
 ## Why it matters for a GPU cloud
 
-- Multi-GPU inference requires NVLink-class links inside a host; scheduling such a job means allocating *all* the GPUs on a node (a gang/topology constraint), not one GPU from a pool. (general knowledge; the bandwidth numbers are src)
+- Multi-GPU inference needs NVLink-class links inside a host to scale well; over PCIe it works but comms costs more. Scheduling such a replica means allocating several GPUs on *one* Node, ideally ones that share NVLink, not GPUs pooled from anywhere. Plain Kubernetes GPU allocation does not guarantee the connected subset; that needs topology-aware setup ([[kubernetes-scheduling]]). (general knowledge; the bandwidth numbers are src)
 - The comms floor is why "more GPUs" is not a linear speedup claim. Quota policies and sales material that imply otherwise will not survive a benchmark. (general knowledge)
 - Pipeline parallelism behaves like a different product: it wants many requests in flight, i.e. a batch service, not an interactive one. (src)
 - Node shape (8-GPU NVLink domains, PCIe vs SXM) determines which models a customer can run at all on one node. (general knowledge)

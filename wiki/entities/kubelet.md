@@ -3,7 +3,7 @@ type: entity
 tags: [lifecycle]
 sources: [2026-11-22-k8s-viewing-pods-and-nodes]
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # kubelet
@@ -14,7 +14,7 @@ The **kubelet** is the [[kubernetes]] agent process that runs on every [[kuberne
 
 - Every Node runs a kubelet. It is responsible for communication between the control plane and the Node, and manages the [[kubernetes-pod|Pods]] and containers running on the machine. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - It does not run containers itself; it delegates to a container runtime such as [[containerd]]. (src for the two-part split: [[2026-11-22-k8s-viewing-pods-and-nodes]]; delegation detail: general knowledge)
-- It reports the Node's status and capacity back to the control plane, sends heartbeats, and runs containers' health checks (liveness/readiness probes), restarting failed containers. (general knowledge)
+- It reports the Node's status and capacity back to the control plane, sends heartbeats, and runs containers' health checks: *liveness* probes (is it still alive? restart it if not) and *readiness* probes (can it take traffic yet? see [[kubernetes-service]]), restarting failed containers. (general knowledge)
 
 ## Why it matters for a GPU cloud
 

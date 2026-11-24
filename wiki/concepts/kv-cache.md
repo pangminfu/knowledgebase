@@ -3,12 +3,12 @@ type: concept
 tags: [provisioning, tenancy-quotas, metering-billing]
 sources: [2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference]
 created: 2026-11-12
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # KV cache
 
-The **kv cache** (also "past cache" or "context cache") is a GPU-memory buffer holding the attention **key** and **value** vectors of every token a language model has already read or generated, so the model does not recompute them when it generates the next token. Analogy: instead of re-reading the whole book each time you write the next sentence, you keep notes on every page. It trades memory for compute, and it is the single biggest reason a chat request's memory grows as the conversation gets longer. (src: [[2026-11-12-transformer-inference-arithmetic]])
+The **kv cache** (also "past cache") is a GPU-memory buffer holding the attention **key** and **value** vectors of every token a language model has already read or generated, so the model does not recompute them when it generates the next token. Analogy: instead of re-reading the whole book each time you write the next sentence, you keep notes on every page. It trades memory for compute. (src: [[2026-11-12-transformer-inference-arithmetic]]) It is the main reason a chat request's memory grows as the conversation gets longer. (general knowledge)
 
 ## Details
 
@@ -27,8 +27,8 @@ The **kv cache** (also "past cache" or "context cache") is a GPU-memory buffer h
 
 ### When not to use it
 
-- If the batch is small you are memory-bandwidth-bound anyway (see [[inference-batching]]), so recomputing spends idle flops and saves memory instead of costing time. The post says to consider dropping the cache at low load. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- It also adds memory traffic: on the benchmarked 13B model, storing to the cache was 18 µs per layer, 0.7 ms per token. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- If the batch is small you are memory-bandwidth-bound anyway (see [[inference-batching]]), so recomputing spends idle flops and saves memory instead of costing time. The post says to consider dropping the cache at low load. (src: [[2026-11-12-transformer-inference-arithmetic]]) This holds only while the recomputed tokens fit in the ~208-token "free" budget; for 2048-token contexts recomputation is not free, and production engines keep the cache. (general knowledge)
+- It also adds memory traffic: on the benchmarked 13B model, storing to the cache cost 18 µs per layer, 0.7 ms in total for the 512-token context pass. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ### Interaction with parallelism
 

@@ -3,7 +3,7 @@ type: concept
 tags: [provisioning, tenancy-quotas, metering-billing]
 sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-10-deep-learning-brrrr-first-principles]
 created: 2026-11-21
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Inference optimization
@@ -43,7 +43,7 @@ Suggested order: each step builds on pages that already exist.
 
 ## Why it matters for a GPU cloud
 
-- The handbook claims a poorly optimized setup "can cost 10× more in GPU hours while delivering worse performance." The number is unsupported in the source, but the direction is consistent with the 208-token batching crossover. (src: [[2026-11-21-what-is-llm-inference]], [[2026-11-12-transformer-inference-arithmetic]])
+- The handbook claims a poorly optimized setup "can cost 10× more in GPU hours while delivering worse performance." The number is unsupported in the source. (src: [[2026-11-21-what-is-llm-inference]]) The direction is consistent with the 208-token batching crossover in [[2026-11-12-transformer-inference-arithmetic]]. (general knowledge)
 - Optimizations change the capacity a quota or price was set against: the same GPU serves more tokens. Quotas set in GPUs and prices set in tokens drift apart as the serving stack improves. (general knowledge)
 
 ## Related

@@ -27,9 +27,9 @@ Catalog of every page in the wiki. One line per page: link — summary.
 - [[gpu-utilization-metrics]] — GPU-Util vs % of peak FLOPS vs DCGM; implications for metering
 - [[kv-cache]] — the per-token attention cache: why sampling needs it, what it costs (~2 MB/token at 52B), when to skip it, offload/prefix-caching
 - [[gpu-memory-capacity]] — weights vs kv cache vs activations; how leftover memory sets max concurrency
-- [[inference-batching]] — tokens in flight as the batch axis; 208-token crossover; batch size trades latency, throughput, cost; continuous batching pointer
+- [[inference-batching]] — tokens per forward pass as the batch axis (batch size at decode); 208-token crossover; batch size trades latency, throughput, cost; continuous batching pointer
 - [[model-parallelism]] — tensor vs pipeline parallelism; 4 comms/layer, the 1040 flops-per-byte test, and the latency floor
-- [[inference-latency-model]] — the two-regime equations (memory-bound / flops-bound) for per-token latency, and why they land within 10–35%
+- [[inference-latency-model]] — the two-regime equations (memory-bound / flops-bound) for per-token latency; naive estimates 24–38% under measured, gap explained by bandwidth efficiency, intermediates, comms
 - [[llm-inference]] — what running a model means; tokens, forward pass, request path (tokenize → schedule → prefill → decode); inference vs serving table
 - [[prefill-and-decode]] — the two GPU phases of a request: parallel prompt pass (compute-heavy) vs one-token-at-a-time decode (memory-bound); pricing asymmetry
 - [[inference-serving]] — everything around inference that makes it a service; serving responsibilities mapped to the four control-plane domains; serverless vs self-hosted

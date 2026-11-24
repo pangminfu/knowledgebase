@@ -3,12 +3,12 @@ type: concept
 tags: [provisioning, metering-billing]
 sources: [2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-12
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Inference latency model
 
-A **closed-form latency model** estimates how long one decode step takes from hardware constants and model size, without running anything. For a language model it comes down to two numbers per candidate regime — time to stream the weights through [[memory-bandwidth]], and time to do the [[flops]] — plus a communication term for multi-GPU serving ([[model-parallelism]]). The result is a *floor*: real software adds 10–35% on top. (src: [[2026-11-12-transformer-inference-arithmetic]])
+A **closed-form latency model** estimates how long one decode step takes from hardware constants and model size, without running anything. For a language model it comes down to two numbers per candidate regime — time to stream the weights through [[memory-bandwidth]], and time to do the [[flops]] — plus a communication term for multi-GPU serving ([[model-parallelism]]). The result is a *floor*: in the source's benchmarks the naive estimate came in 24% (1 GPU) and 38% (2 GPUs) below measured latency. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ## Details
 
@@ -36,7 +36,7 @@ latency ≈ max(compute, comms)
 
 - `2 bytes · P` is the size of the weights (16-bit), read once per token; divide by bandwidth and by `N` GPUs. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - Comms is pure latency: four messages per layer, each ~8 µs, not multiplied by batch because a message can carry the whole batch. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- 52B on one A100: `2 · 52e9 / 1.5e12` ≈ 69 ms per token; on four GPUs ≈ 17 ms. Same numbers whether you count bytes (`2·P`) or flops (`2·12·n_layers·d_model²`). (src: [[2026-11-12-transformer-inference-arithmetic]])
+- 52B on one A100: `2 · 52e9 / 1.5e12` ≈ 69 ms per token (hypothetical: the weights don't fit on one 40 GB card); on four GPUs ≈ 17 ms. Same numbers whether you count bytes (`2·P`) or flops (`2·12·n_layers·d_model²`). (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ### Large batch (flops bound)
 
@@ -68,7 +68,7 @@ latency ≈ max(compute, comms)
 
 ### What the model omits
 
-- Unfused elementwise/normalisation kernels: 43% of latency at 336M parameters, ~5% at 52B. See [[operator-fusion]]. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Memory-bound elementwise/normalisation kernels: 43% of latency at 336M parameters even with the paper's fused kernels, ~5% at 52B. See [[operator-fusion]]. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - Reads of the [[kv-cache]] and of the unembedding matrix (to produce logits), both memory costs that grow with context and vocabulary. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - Intermediate activations, which the source calls hard to count and software-dependent. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - Cross-node networking, queueing, padding, and any batching across requests of different lengths. (general knowledge)
@@ -77,13 +77,13 @@ latency ≈ max(compute, comms)
 ### Reconciling prediction with measurement
 
 - One GPU, 13B: predicted 16.8 ms, measured 22.0 ms. At 90% achieved bandwidth → 18.5 ms; plus 2.2 ms of intermediate ops → 20.7 ms; the last 1.4 ms is token embeddings, sampling (top-k/top-p), sub-90% average bandwidth, kernel launch. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- Two GPUs: predicted 8.4 ms, measured 13.5 ms. At 87% bandwidth → 9.5 ms; plus 2.0 ms intermediates → 11.5 ms; plus ~1.7 ms of un-overlapped comms (40–50 µs per layer) → 13.2 ms. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Two GPUs: predicted 8.4 ms, measured 13.5 ms. At 87% bandwidth → 9.5 ms; plus 2.0 ms intermediates → 11.5 ms (the source writes 11.7 ms); plus ~1.7 ms of un-overlapped comms (40–50 µs per layer) → 13.2 ms. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ## Why it matters for a GPU cloud
 
 - This is the arithmetic a capacity planner uses before buying: model size → GPUs needed → batch that fits → tokens/s → cost per token. See the worked version in [[2026-11-12-sizing-a-gpu-inference-deployment]]. (general knowledge)
 - It is also the honest way to answer "why is my GPU not at 100%?": at small batch you are memory-bound by definition, and no amount of GPU-Util will show otherwise ([[gpu-utilization-metrics]]). (src + general knowledge)
-- Predictions within 10–35% are good enough for SKU selection and bad enough that any per-token price must come from a benchmark. (general knowledge)
+- Naive predictions 24–38% off, closed by measured corrections, are good enough for SKU selection and bad enough that any per-token price must come from a benchmark. (general knowledge)
 
 ## Related
 

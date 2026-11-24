@@ -3,7 +3,7 @@ type: concept
 tags: [metering-billing]
 sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-10
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # GPU performance regimes
@@ -36,7 +36,7 @@ A factory twice the size, still fed by the same conveyor belts. Output can't dou
 Generation has no batch to hide behind: each new token requires reading every weight, and the "[batch]" is how many tokens are in flight. A current model of this says the crossover is the hardware's flops-per-byte ratio (312e12 ÷ 1.5e12 = 208 for an A100), so a single-request decode is bandwidth-bound and stays so until hundreds of tokens are batched together. (src: [[2026-11-12-transformer-inference-arithmetic]]) See [[inference-batching]] and [[inference-latency-model]].
 
 - Regimes are therefore a property of the *load*, not just of the model: the same model is memory-bound at batch 1 and flops-bound at batch 512. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- The overhead regime is largely absent from these models — real stack overhead lands as a 10–35% gap between predicted and measured latency. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- The overhead regime is largely absent from these models. The gap between naive prediction and measurement (24–38% in the source's benchmarks) comes mostly from sub-peak bandwidth, intermediate ops, and comms, with only small leftovers such as kernel launch time. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ## Why it matters for a GPU cloud
 

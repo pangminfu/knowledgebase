@@ -3,7 +3,7 @@ type: concept
 tags: [metering-billing, tenancy-quotas]
 sources: [2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic, 2026-11-10-deep-learning-brrrr-first-principles, 2026-11-22-training-vs-inference]
 created: 2026-11-21
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Per-token pricing
@@ -26,7 +26,7 @@ updated: 2026-11-22
 
 ### Why a token's cost is not fixed
 
-- The GPU cost of a token depends on how many tokens share each pass over the weights. Below ~208 tokens in flight on an A100, the GPU is memory-bound and extra tokens are nearly free; above it, cost per token is flat. (src: [[2026-11-12-transformer-inference-arithmetic]]) See [[inference-batching]].
+- The GPU cost of a token depends on how many tokens share each pass over the weights. Below ~208 tokens per pass on an A100 (at decode, a batch below ~208 sequences), the GPU is memory-bound and extra tokens are nearly free; above it, cost per token is flat. (src: [[2026-11-12-transformer-inference-arithmetic]]) See [[inference-batching]].
 - So a per-token provider is really selling **batching efficiency**: margin = price per token − (GPU-hour cost ÷ tokens per GPU-hour actually achieved). (general knowledge; the arithmetic is from [[2026-11-12-transformer-inference-arithmetic]])
 - Input and output tokens cost differently to produce. Prompt tokens go through one parallel prefill pass; each output token needs its own memory-bound decode step ([[prefill-and-decode]]). Commercial APIs commonly price output tokens higher. (src for the phase asymmetry: [[2026-11-12-transformer-inference-arithmetic]]; pricing practice: general knowledge)
 - [[inference-optimization]] (continuous batching, quantization, prefix caching) raises tokens per GPU-hour. The handbook claims a poorly optimized stack can cost 10× more in GPU hours, without evidence. (src: [[2026-11-21-what-is-llm-inference]])

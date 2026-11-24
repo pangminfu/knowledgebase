@@ -3,7 +3,7 @@ type: concept
 tags: [tenancy-quotas, metering-billing, lifecycle, provisioning]
 sources: [2026-11-22-k8s-using-a-service-to-expose-your-app]
 created: 2026-11-22
-updated: 2026-11-23
+updated: 2026-11-24
 ---
 
 # Labels and selectors (Kubernetes)
@@ -19,7 +19,7 @@ A **label** is a key/value tag attached to a [[kubernetes]] object, such as `app
 - With [[kubectl]], labels filter any listing: `kubectl get pods -l app=kubernetes-bootcamp`, `kubectl get services -l ...`, `kubectl delete service -l ...`. `kubectl label pods <pod> version=v1` adds a label. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
 - Two kinds of selector: **equality-based** (`app=A`, `tier!=cache`) and **set-based** (`env in (prod, staging)`, `!gpu`). (general knowledge)
 - Labels are for identifying and selecting. Arbitrary non-identifying metadata (build info, owner contact, tool config) goes in **annotations**, which cannot be selected on. (general knowledge)
-- Labels vs **namespaces**: a namespace is a hard partition with its own access control and quotas, and each object lives in exactly one. Labels are soft, overlapping tags; an object can carry many. (general knowledge)
+- Labels vs **namespaces**: a namespace is a hard partition with its own access control and quotas, and each *namespaced* object (Pod, Service, Deployment) lives in exactly one. Some kinds, such as Nodes, are cluster-scoped and belong to no namespace. Labels are soft, overlapping tags; an object can carry many. (general knowledge)
 
 ## GPU cloud bridge
 
@@ -32,7 +32,7 @@ All general knowledge; not from the source.
 | Lifecycle | `version` labels drive rollouts: a Service whose selector includes `version=v2` switches traffic in one edit (blue/green), or two Deployments share an `app` label for a canary split. Cordoned/repair state is often mirrored in Node labels. |
 | Metering and billing | Cost tools (e.g. OpenCost) aggregate Pod GPU-hours by namespace and label. A missing or wrong tenant label means unattributed spend, so platforms set labels themselves and don't trust user-supplied ones for billing ([[gpu-utilization-metrics]], [[per-token-pricing]]). |
 
-- **Labels are mutable, which is a risk.** Anyone with edit rights on a Pod can change its labels and so move it into or out of a Service, or change how it is billed. Platforms restrict who can set billing- and routing-relevant labels (admission policies).
+- **Labels are mutable, which is a risk.** Anyone with edit rights on a Pod can change its labels and so move it into or out of a Service, or change how it is billed. Platforms restrict who can set billing- and routing-relevant labels with admission policies (rules the API server checks before it accepts an object).
 
 ## Related
 

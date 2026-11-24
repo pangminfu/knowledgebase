@@ -3,7 +3,7 @@ type: concept
 tags: [lifecycle, provisioning, metering-billing]
 sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app]
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Pod (Kubernetes)
@@ -32,7 +32,7 @@ Four Pods, each with its own IP (10.10.10.1–4). They range from one container 
 All general knowledge; not from the source.
 
 - **An inference replica is usually one Pod.** Its main container runs an [[inference-frameworks|inference server]] such as vLLM. The Pod requests GPUs in its resource spec, for example `nvidia.com/gpu: 4`, and the scheduler only places it on a Node with 4 free GPUs ([[kubernetes-scheduling]]).
-- **GPUs are whole units by default.** A Pod gets whole GPUs, and two Pods never share one unless the operator turns on sharing (MIG partitions or time-slicing).
+- **GPUs are whole units by default.** A Pod gets whole GPUs, and two Pods never share one unless the operator turns on sharing: MIG (Multi-Instance GPU, which splits one GPU into isolated hardware slices) or time-slicing (Pods take turns on the whole GPU).
 - **A replica that fits on one Node is one Pod.** A tensor-parallel replica that needs 4 GPUs on one Node ([[model-parallelism]]) is one Pod asking for 4 GPUs, so it lands all-or-nothing on one machine. Only replicas spanning several Nodes become several Pods that must be started together, which is the harder *gang scheduling* problem.
 - **Pods are natural metering records.** "Pod X held 4 GPUs on Node Y from 10:02 to 11:47" is the raw fact behind GPU-hour billing ([[per-token-pricing]] covers the token-based alternative).
 - **Replacement means cold start.** When a Node dies, the replacement inference Pod must pull its image and reload model weights before it can serve, which can take minutes for large models.

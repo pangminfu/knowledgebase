@@ -3,7 +3,7 @@ type: concept
 tags: [provisioning]
 sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-10
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # FLOPS
@@ -13,7 +13,7 @@ A **FLOP** is one floating-point operation: a single add or multiply on a decima
 ## Details
 
 - Peak FLOPS depends on the kind of math. Modern accelerators have special hardware for matrix multiplication ("matmul"), e.g. NVIDIA **Tensor Cores**. An [[nvidia-a100]] reaches 312 TFLOPS only on matmuls; everything else gets 19.5 TFLOPS. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
-- Even the 19.5 assumes fused multiply-add (FMA: multiply then add in one instruction, counted as 2 FLOPs). Fully general code reaches about 9.75 TFLOPS on an A100. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
+- Even the 19.5 relies on special hardware for fused multiply-add (FMA: multiply then add in one instruction). Fully general code reaches about 9.75 TFLOPS on an A100. (src: [[2026-11-10-deep-learning-brrrr-first-principles]]) The halving is because an FMA counts as 2 FLOPs. (general knowledge)
 - TPUs (Google's accelerators) are even more specialized for matmul than GPUs. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - Matmuls ("tensor contractions") dominate FLOP counts but not runtime:
 

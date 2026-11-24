@@ -22,7 +22,7 @@ Numbers meant to say how "busy" a GPU is. They measure very different things. **
 
 - GPU-Util is a good way to eyeball [[framework-overhead]]: gaps between kernels show up as lower util. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - GPU-Util can't distinguish a kernel using the whole chip from one barely using it. A memory-bound kernel counts as 100% busy. (general knowledge; follows from the definition in src)
-- Naming trap: the source stresses the column is "GPU-Util", **not** "Volatile GPU-Util". In `nvidia-smi`'s table layout, "Volatile" belongs to the neighbouring "Volatile Uncorr. ECC" column. (src: [[2026-11-10-deep-learning-brrrr-first-principles]]; column explanation: general knowledge)
+- Naming trap: the source stresses the column is "GPU-Util", **not** "Volatile GPU-Util". In `nvidia-smi`'s two-line header, "Volatile Uncorr. ECC" (an error counter) sits directly above "GPU-Util" in the same cell, so the two are easy to read as one label. (src: [[2026-11-10-deep-learning-brrrr-first-principles]]; layout explanation: general knowledge)
 - LLM serving makes this concrete: a single-request decode is memory-bandwidth-bound by construction, so every kernel runs, util reads high, and achieved FLOPS sits far below peak. See [[inference-batching]]. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ## Why it matters for a GPU cloud

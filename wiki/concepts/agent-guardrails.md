@@ -21,8 +21,8 @@ updated: 2026-11-24
 | Hook | Deterministic | Script that runs before or after an action and can **allow**, **ask** (wait for a named human), or **block** | Block `deploy … production` without a release authorization |
 | Permission rules | Deterministic | Allow/deny lists for tools, files, and commands | Deny reading `.env*`; allow `make test` |
 | Sandbox | Deterministic (OS level) | Filesystem and network isolation for shell commands | Network allowlist of two domains; deny `~/.ssh` |
-| Branch protection | Deterministic | Merges need a code owner's approval and passing checks | The agent cannot push to main |
-| Managed settings | Deterministic | Org-wide settings pushed by IT that engineers cannot override | Only managed hooks and MCP servers may run |
+| Branch protection | Deterministic | Merges need a code owner's approval (and usually passing checks: general knowledge) | The agent cannot push to main |
+| Managed settings | Deterministic | Org-wide settings pushed by IT that engineers cannot override | Only managed hooks and [[claude-code#Features the playbook uses\|MCP]] servers (connectors to other tools) may run |
 
 (src: [[2026-11-24-ai-native-sdlc-playbook]])
 

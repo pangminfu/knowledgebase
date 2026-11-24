@@ -81,7 +81,7 @@ The playbook calls each practice a "play". Every play lists what changes, prereq
 | Maintain | Recurring scans | Scheduled security scans (Claude Security); findings go through the review gate | Repos on schedule / scan vs production findings |
 | Maintain | Claude Tag | Claude as an incident-channel member under its own identity | (none given) |
 
-(src: [[2026-11-24-ai-native-sdlc-playbook]]) DORA = DevOps Research and Assessment, the standard four delivery metrics: deployment frequency, lead time for changes, change failure rate, time to restore service (metric names: general knowledge).
+(src: [[2026-11-24-ai-native-sdlc-playbook]]) DORA = DevOps Research and Assessment. Its delivery metrics were four keys (deployment frequency, lead time for changes, change failure rate, time to restore service) until 2024; it now uses five: change lead time, deployment frequency, failed deployment recovery time, change fail rate, deployment rework rate. The playbook only says "DORA measures". (metric names: general knowledge, dora.dev)
 
 ![[raw/assets/sdlc-play-dependencies.png]]
 The adoption-order graph. The five plays with no prerequisites sit on top: capture intent, `CLAUDE.md`, feedback loop, hooks, plan mode. `CLAUDE.md` leads to skills, subagents, and evals; the feedback loop also leads to evals (and softly to subagents). Skills plus intent lead to requirements & design. Evals lead to PR review (skills softly too), then CI/CD (which also needs hooks), then closing the loop (which also needs intent). Plan mode has nothing after it. Dotted arrows are soft dependencies. (src: [[2026-11-24-ai-native-sdlc-playbook]])

@@ -6,7 +6,7 @@ raw: raw/2026-11-12-transformer-inference-arithmetic.md
 url: https://kipp.ly/p/transformer-inference-arithmetic
 author: Carol Chen (kipply)
 created: 2026-11-12
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Transformer Inference Arithmetic
@@ -15,7 +15,7 @@ Raw: [[raw/2026-11-12-transformer-inference-arithmetic]] · Carol Chen ("kipply"
 
 ## Summary
 
-A worked calculation of how fast a large language model can *serve* text, done with arithmetic instead of experiments. It walks through four things you can count on paper: the [[kv-cache]] that makes sampling cheap, the GPU memory that cache and the model weights compete for ([[gpu-memory-capacity]]), the [[model-parallelism]] needed when the model does not fit on one GPU, and the resulting [[inference-latency-model]]. Every quantity is in units of [[flops]] and bytes, so the same handful of ratios decides whether a given request is compute-bound or [[memory-bandwidth]]-bound ([[gpu-performance-regimes]]). The predictions are then checked against NVIDIA FasterTransformer benchmarks on a 13B model, landing within 10–35% of measured latency.
+A worked calculation of how fast a large language model can *serve* text, done with arithmetic instead of experiments. It walks through four things you can count on paper: the [[kv-cache]] that makes sampling cheap, the GPU memory that cache and the model weights compete for ([[gpu-memory-capacity]]), the [[model-parallelism]] needed when the model does not fit on one GPU, and the resulting [[inference-latency-model]]. Every quantity is in units of [[flops]] and bytes, so the same handful of ratios decides whether a given request is compute-bound or [[memory-bandwidth]]-bound ([[gpu-performance-regimes]]). The predictions are then checked against NVIDIA FasterTransformer benchmarks on a 13B model: the naive estimates come in 24% (1 GPU) and 38% (2 GPUs) below measured latency, and measured bandwidth efficiency, intermediate ops, and comms account for nearly all of the gap.
 
 **Why a control-plane engineer should care:** this post is the arithmetic behind three product decisions. How many concurrent requests fit on one GPU (capacity → quotas and packing). How big a batch to run (throughput vs latency → SLA and price). How many GPUs one model needs and how they must be wired (→ node shape, NVLink, multi-GPU scheduling). It also explains why "tokens per second" is the natural metering unit for inference, in contrast to the GPU-hours model used for training. (general knowledge)
 
@@ -35,15 +35,15 @@ Sampling loop with a [[kv-cache]]: the prompt (`a b c d e f g`, bottom left) is 
 ### The one ratio that decides everything: 208 flops/byte
 
 - An A100 does 312e12 flops/s and 1.5e12 bytes/s, so it has **208 flops per byte** of bandwidth. Below that arithmetic intensity you are memory-bound; above, compute-bound. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- For inference, the "batch" axis is tokens in flight (batch size × context length). Up to ~208 tokens, reading the weights dominates and extra tokens are nearly free; beyond ~208, time grows with tokens. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- For inference, the axis is tokens processed in one forward pass: computing for up to ~208 tokens takes the same time as for one, because reading the weights dominates; beyond ~208, time grows with tokens. At decode each sequence adds one token per pass, so the threshold becomes a batch size of ~208. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ![[raw/assets/tia-roofline.png]]
-The post's roofline: time for a forward pass versus tokens in flight. Memory time is flat (all weights must be read once regardless of batch); compute time rises linearly; they cross at 208 tokens.
+The post's roofline: time for a forward pass versus tokens in the pass. Memory time is flat (all weights must be read once regardless of batch); compute time rises linearly; they cross at 208 tokens.
 
 ### Capacity sets batch size, batch size sets cost
 
 - A 52B model at 16 bits is 104 GB of weights — it does not fit on one 40 GB A100, so at least 3 (sensibly 4) GPUs are needed; see [[gpu-memory-capacity]]. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- Four A100-40GB give 160 GB: 56 GB left for the cache, ≈ 23,000 cached tokens, e.g. batch 4 × 2048-token requests. Three GPUs leave only 16 GB ≈ 8,000 tokens. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Four A100-40GB give 160 GB: 56 GB left for the cache. The post says ≈ 23,000 cached tokens, but its own numbers give 56 ÷ 0.002 ≈ 28,000 (arithmetic check, this wiki). Three GPUs leave only 16 GB ≈ 8,000 tokens, i.e. batch 4 × 2048-token requests. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - Because weights are a fixed cost per replica, bigger batches amortize them better; but batch size cannot grow past what memory allows. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ### Model parallelism and its communication floor
@@ -67,8 +67,8 @@ Tensor parallel split for a 2-GPU, 2-head toy model: each GPU holds half the que
 
 ### Small ops: real, then irrelevant
 
-- Softmax, layernorm, biases, ReLU, dropout are memory-bound and cost far more time than their flop share. In a 336M-parameter model they are **43% of latency**, and at that size an unfused softmax (453 µs) costs more than q/k/v projection (333 µs). (src: [[2026-11-12-transformer-inference-arithmetic]])
-- Scaling saves you: per-layer memory traffic grows ~`d_model` while flops grow ~`d_model²`, so at 52B these ops are ~5% of latency. Fix is [[operator-fusion]]. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Softmax, layernorm, biases, ReLU, dropout are memory-bound and cost far more time than their flop share. In a 336M-parameter model they are still **43% of latency** even with the paper's optimised (fused) kernels; in plain PyTorch an unfused softmax (453 µs) costs more than the q/k/v projection (333 µs). (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Scaling saves you: per-layer memory traffic grows ~`d_model` while flops grow ~`d_model²`, so at 52B (with the same optimisations) these ops are ~5% of latency. Fix is [[operator-fusion]]. (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ![[raw/assets/tia-table-a1.png]]
 Table A.1 from "Data Movement Is All You Need" (336M BERT, `d_model`=1024, 24 layers), reproduced by the post: per-operator FLOPs, memory traffic, PyTorch time, and optimised time. Scaled softmax spends 453 µs against its 0.2 GFLOP, versus 333 µs for Q/K/V at 25.8 GFLOP — the memory-bound signature.
@@ -76,7 +76,7 @@ Table A.1 from "Data Movement Is All You Need" (336M BERT, `d_model`=1024, 24 la
 ### Checks against real hardware
 
 - 13B model (40 layers, 40 heads, `d_head` 128, `d_model` 5120), FasterTransformer, 512-token context, one output token: predicted 16.8 ms on one GPU, 8.4 ms on two. Measured: **22.0 ms** and **13.5 ms**. (src: [[2026-11-12-transformer-inference-arithmetic]])
-- The gap is accounted for: ~90% of peak bandwidth achieved (not 100%), ~2.2 ms of unfused intermediate ops, 0.7 ms of cache stores, ~0.2 ms memsets, and ~1.7 ms of un-overlapped comms on the 2-GPU run. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- The decode gap is accounted for: ~90% (1 GPU) and ~87% (2 GPUs) of peak bandwidth achieved, ~2 ms of intermediate ops, and ~1.7 ms of un-overlapped comms on the 2-GPU run. Separately, the 512-token context pass spends 0.7 ms storing kv and ~0.2 ms on memsets. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - Achieved flops also fall short for small matrices: an MLP matmul expected at 344 µs took 476 µs (72% of peak); an attention projection expected at 86 µs took 159 µs (54%). (src: [[2026-11-12-transformer-inference-arithmetic]])
 
 ## The post's central tradeoff table
@@ -95,7 +95,7 @@ Three consequences of batch size, left to right: memory is mostly weights at sma
 
 ## Takeaways
 
-- Any SKU's flops-per-byte threshold is peak FLOPS ÷ memory bandwidth (208 for an A100). It is the number of tokens in flight at which serving stops being memory-bound and becomes compute-bound, so it sets the useful batch size. (src: [[2026-11-12-transformer-inference-arithmetic]])
+- Any SKU's flops-per-byte threshold is peak FLOPS ÷ memory bandwidth (208 for an A100). It is the number of tokens per forward pass (at decode, the batch size) at which serving stops being memory-bound and becomes compute-bound, so it sets the useful batch size. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - A 52B fp16 model (104 GB) cannot run on one 40 GB GPU. Whatever memory the weights leave free becomes kv cache, which caps how many tokens can be in flight. (src: [[2026-11-12-transformer-inference-arithmetic]])
 - Adding GPUs stops lowering latency because the communication floor does not shrink, and pipeline parallelism does not speed up a single request because only one GPU works on it at a time. (src: [[2026-11-12-transformer-inference-arithmetic]])
 

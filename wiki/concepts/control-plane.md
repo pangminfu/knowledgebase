@@ -21,7 +21,7 @@ The **control plane** is the part of a system that *decides and manages*; the **
   - **etcd:** the database holding the cluster's desired and current state.
   - **Scheduler:** picks a Node for each new Pod.
   - **Controller manager:** runs controllers (e.g. for [[kubernetes-deployment|Deployments]] and [[kubernetes-replicaset|ReplicaSets]]) that keep comparing desired state to actual state and fixing the difference. This loop is called **reconciliation**.
-- Reconciliation in action: `kubectl scale --replicas=4` only records a new desired count. The ReplicaSet's DESIRED becomes 4, and Pods are created until CURRENT matches ([[kubernetes-scaling]]). (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
+- Reconciliation in action: the tutorial runs `kubectl scale --replicas=4`, and `get` then shows the ReplicaSet's DESIRED at 4 and new Pods appearing ([[kubernetes-scaling]]). (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]) Under the hood, `scale` only records a new desired count in the Deployment's `.spec.replicas`; the Deployment controller passes it to the ReplicaSet, whose controller creates Pods until CURRENT matches. (general knowledge)
 - The Nodes, kubelets, and containers doing the work are the data plane. (general knowledge)
 
 ### Level 2: a GPU cloud's control plane

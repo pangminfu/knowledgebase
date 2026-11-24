@@ -17,19 +17,21 @@ updated: 2026-11-24
 | Feature | What it is | Where it lives |
 | --- | --- | --- |
 | Plan mode | Read-only mode: Claude studies the code and writes a plan, and cannot edit files until the engineer accepts it | Session permission mode |
-| Auto mode | Claude applies each change without asking per edit; the default for routine, well-tested, small-blast-radius work once guardrails mature | Session permission mode |
+| Auto mode | Claude works through the approved plan without a per-edit prompt; the default for routine, well-tested, small-blast-radius work once guardrails mature | Session permission mode |
 | `CLAUDE.md` | Project instructions read at the start of every session; `/init` generates a first draft | Repo root |
 | Skills | Policy or procedure as a folder with a `SKILL.md`, loaded when relevant | `.claude/skills/<name>/`, or org-wide via plugins |
-| Hooks | Scripts that run around agent actions and allow, ask, or block (e.g. a `PreToolUse` hook on `Bash`) | `.claude/settings.json`, or managed settings |
+| Hooks | Scripts that run around agent actions and allow, ask, or block (e.g. a `PreToolUse` hook, which fires before a tool call, on `Bash`) | `.claude/settings.json`, or managed settings |
 | Subagents | Scoped helpers inside one session with their own context window and tool limits (e.g. a verifier, a code simplifier, a researcher) | `.claude/agents/*.md` |
 | Worktrees | Parallel sessions, each in its own git checkout and branch (`claude --worktree <name>`) | Git |
 | Non-interactive mode | `claude -p "<prompt>"` for CI jobs and evals | CI runners |
 | claude-code-action / Code Review | Runs Claude in GitHub CI; managed PR review service enabled by an admin | GitHub |
 | MCP connectors | Tools and data from other systems (Jira, deploy tooling, browsers) | Settings / plugins |
-| Managed settings | Org-wide settings engineers cannot override | MDM or admin console |
-| OpenTelemetry export | Session traces and hook decisions sent to the org's observability stack | Settings |
+| Managed settings | Org-wide settings engineers cannot override | MDM (mobile device management: IT's tool for pushing config to company machines) or admin console |
+| OpenTelemetry export | Session traces and hook decisions sent to the org's observability stack (OpenTelemetry is the standard telemetry format) | Settings |
 
 (src: [[2026-11-24-ai-native-sdlc-playbook]])
+
+- The playbook's "auto mode" wording mixes two current modes (general knowledge, per Claude Code's permission-modes docs, Nov 2026): `acceptEdits` auto-approves file edits and common filesystem commands only, while `auto` runs everything and has a second classifier model review each action instead of the human. `auto` is the built-in starting mode for interactive terminal and VS Code sessions on recent versions.
 
 - **MCP (Model Context Protocol)** is an open protocol for connecting AI agents to external tools and data sources, so one integration works across agents. (general knowledge)
 - Model access can go through Anthropic's API or through AWS Bedrock, Google Vertex, or Microsoft Foundry when traffic must stay on the organization's cloud agreement. (src: [[2026-11-24-ai-native-sdlc-playbook]])

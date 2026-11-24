@@ -6,7 +6,7 @@ raw: raw/2026-11-22-k8s-using-a-service-to-expose-your-app.md
 url: https://kubernetes.io/docs/tutorials/kubernetes-basics/expose/expose-intro/
 author: Kubernetes documentation (kubernetes.io)
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Using a Service to Expose Your App (Kubernetes Basics, Module 4)
@@ -64,7 +64,7 @@ A Service (`svc`, IP 1.1.1.1) with selector `app=A` sends traffic to every Pod l
 - A Service separates *how clients reach an app* from *which Pods currently run it*. Pods come and go; the Service's address and name stay put. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
 - Membership is a live label query, not a list. Any Pod whose labels match the selector receives traffic, whoever created it, so labels effectively control routing. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]]; "live query" framing: general knowledge)
 - The four types form a ladder of exposure. LoadBalancer is where Kubernetes hands off to the cloud provider's own networking. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
-- Exposure and workload lifecycle are separate objects. Deleting a Service cuts the route but not the Pods, and deleting Pods does not delete the Service. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]])
+- Exposure and workload lifecycle are separate objects. Deleting a Service cuts the route but not the Pods. (src: [[2026-11-22-k8s-using-a-service-to-expose-your-app]]) The reverse also holds: deleting Pods does not delete the Service. (general knowledge)
 
 ## Concepts & entities touched
 

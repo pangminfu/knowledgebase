@@ -3,7 +3,7 @@ type: entity
 tags: [metering-billing, lifecycle]
 sources: [2026-11-10-deep-learning-brrrr-first-principles]
 created: 2026-11-10
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # nvidia-smi
@@ -14,7 +14,7 @@ NVIDIA's command-line tool ("System Management Interface") for checking the stat
 
 - The memory it reports is the GPU's DRAM, the pool behind "CUDA out of memory" errors. See [[memory-bandwidth]]. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
 - **GPU-Util** = % of time a GPU kernel is running. Useful for spotting [[framework-overhead]], but it does not measure how much of the GPU's capacity is used. See [[gpu-utilization-metrics]]. (src: [[2026-11-10-deep-learning-brrrr-first-principles]])
-- The column is "GPU-Util", not "Volatile GPU-Util". The word "Volatile" belongs to the adjacent ECC column. (src: [[2026-11-10-deep-learning-brrrr-first-principles]]; column explanation: general knowledge)
+- The column is "GPU-Util", not "Volatile GPU-Util". (src: [[2026-11-10-deep-learning-brrrr-first-principles]]) In `nvidia-smi`'s two-line header, "Volatile Uncorr. ECC" sits directly above "GPU-Util" in the same cell, so the two are easy to read as one label. (general knowledge)
 
 ## Why it matters for a GPU cloud
 

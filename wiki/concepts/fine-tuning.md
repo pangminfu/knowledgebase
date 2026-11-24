@@ -3,7 +3,7 @@ type: concept
 tags: [lifecycle, provisioning]
 sources: [2026-11-22-training-vs-inference]
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Fine-tuning
@@ -13,7 +13,7 @@ updated: 2026-11-22
 ## Details
 
 - In the model lifecycle it comes after base training and alignment, and before evaluation and deployment. It is optional. (src: [[2026-11-22-training-vs-inference]])
-- Most companies should fine-tune an existing open-source model rather than train their own. Training from scratch needs massive datasets, specialized hardware, and a research team. It is justified only when existing models cannot handle the problem, or when control requirements cannot be met by fine-tuning. (src: [[2026-11-22-training-vs-inference]])
+- Most companies should start from an existing open-source model and fine-tune or otherwise customize it, rather than train their own. Training from scratch needs massive datasets, specialized hardware, and a research team. It is justified only when existing models cannot handle the problem, or when control requirements cannot be met by fine-tuning. (src: [[2026-11-22-training-vs-inference]])
 - Common variants update only a small set of extra weights, an **adapter** (LoRA is the best-known method). The adapter is small, and many adapters can share one base model when serving. (general knowledge)
 
 ## Why it matters for a GPU cloud

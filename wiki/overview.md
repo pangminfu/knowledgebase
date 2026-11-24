@@ -39,8 +39,8 @@ The second source turns the same physics into a sizing procedure for model servi
 The chain is four arithmetic steps, laid out end to end in [[2026-11-12-sizing-a-gpu-inference-deployment]]:
 
 1. **Weights → GPUs.** 2 bytes per parameter at 16-bit; a 52B model is 104 GB, so it cannot fit on a 40 GB card ([[gpu-memory-capacity]]).
-2. **Leftover memory → concurrency.** The [[kv-cache]] costs ~2 MB per token for that model, so the remaining 56 GB on four cards is ~23,000 cached tokens.
-3. **Concurrency → cost.** Batching below ~208 tokens in flight leaves the GPU memory-bandwidth-bound; above it, flops-bound and cheaper per token ([[inference-batching]]).
+2. **Leftover memory → concurrency.** The [[kv-cache]] costs ~2 MB per token for that model, so the remaining 56 GB on four cards is ~28,000 cached tokens (the source prints 23,000, an arithmetic slip; see [[gpu-memory-capacity]]).
+3. **Concurrency → cost.** Below ~208 tokens per forward pass (at decode: a batch of ~208 sequences) the GPU is memory-bandwidth-bound; above it, flops-bound and cheaper per token ([[inference-batching]]).
 4. **GPUs → latency floor.** Tensor parallelism cuts compute by `1/N` but adds a fixed four-per-layer communication cost, so more GPUs stop helping past a point ([[model-parallelism]], [[inference-latency-model]]).
 
 Control-plane consequences (general knowledge unless cited):
@@ -98,7 +98,7 @@ Control-plane consequences (general knowledge):
 
 ### Sizing the fleet: scaling replicas
 
-[[kubernetes-scaling|Scaling]] means changing one number: a Deployment's replica count, its desired state. Its [[kubernetes-replicaset|ReplicaSet]] compares DESIRED with CURRENT and creates or terminates Pods to close the gap. New Pods are scheduled to Nodes with free resources, and scaling to zero terminates all Pods. The Service tracks running Pods through endpoints, so traffic spreads across new replicas automatically and the address never changes. Multiple replicas are also what make zero-downtime rolling updates possible. Autoscaling exists; it writes the same number automatically. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
+[[kubernetes-scaling|Scaling]] means changing one number: a Deployment's replica count, its desired state. Its [[kubernetes-replicaset|ReplicaSet]] compares DESIRED with CURRENT and creates or terminates Pods to close the gap. New Pods are scheduled to Nodes with free resources, and scaling to zero terminates all Pods. The Service tracks running Pods through endpoints, so traffic spreads across new replicas automatically and the address never changes. Multiple replicas also make zero-downtime rolling updates easier. Autoscaling exists; it writes the same number automatically. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
 
 Control-plane consequences (general knowledge):
 

@@ -3,7 +3,7 @@ type: concept
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
 sources: [2026-11-22-training-vs-inference, 2026-11-21-what-is-llm-inference, 2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Training vs inference
@@ -57,7 +57,7 @@ The handbook gives the contrast, and the mapping to domains below is this wiki's
 | --- | --- | --- |
 | **Provisioning** | Allocate a whole cluster: N nodes × 8 GPUs with a fast interconnect between nodes, for a fixed window. It is all-or-nothing (gang scheduling), and topology matters as much as GPU count. | Create an endpoint: a model, a GPU SKU, a replica size from [[gpu-memory-capacity]], and min/max replicas. Placement is chosen to be near users. |
 | **Tenancy and quotas** | Quota is GPUs or nodes per tenant, often as reserved capacity blocks with a start and end date. Jobs may tolerate preemption if they checkpoint. | Quota is rate limits (requests or tokens per minute) plus max replicas or GPUs. Shared replicas mix tenants in one batch ([[inference-batching]]). |
-| **Lifecycle** | A batch job (Kubernetes Job, Slurm). One bad GPU can stall or crash the whole job, so the job checkpoints, the failed node is replaced, and the job resumes. Node health checks gate admission. | A long-running service ([[kubernetes-deployment|Kubernetes Deployment]]). The system does rolling model upgrades, health checks, autoscaling, and handles cold start while weights load. A bad node loses one replica, not the service. |
+| **Lifecycle** | A batch job (Kubernetes Job, Slurm). One bad GPU can stall or crash the whole job, so the job checkpoints, the failed node is replaced, and the job resumes. Node health checks gate admission. | A long-running service ([[kubernetes-deployment\|Kubernetes Deployment]]). The system does rolling model upgrades, health checks, autoscaling, and handles cold start while weights load. A bad node loses one replica, not the service. |
 | **Metering and billing** | GPU-hours for the reserved window, usually committed in advance and paid whether used or not. | Per token (serverless) or per endpoint GPU-hour (dedicated). It is continuous and traffic-driven ([[per-token-pricing]]). |
 | **What "good" looks like** | High utilization over a long job, few restarts, and fast recovery. | Latency targets met at the lowest cost per token, with no dropped requests. |
 

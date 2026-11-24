@@ -3,7 +3,7 @@ type: entity
 tags: [lifecycle]
 sources: [2026-11-22-k8s-viewing-pods-and-nodes]
 created: 2026-11-22
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # containerd
@@ -14,7 +14,7 @@ updated: 2026-11-22
 
 - Every Node runs a container runtime "like containerd", responsible for pulling the container image from a registry, unpacking the container, and running the application. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - The tutorial switched its runtime example from Docker to containerd in July 2026 (commit "Update container runtime reference from Docker to containerd"), but its Nodes diagram still says "Docker". (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
-- Kubernetes removed its built-in Docker support ("dockershim") in v1.24 (2022). Images built with Docker still run under containerd because both use the same standard image format (OCI). (general knowledge)
+- Kubernetes removed its built-in Docker support ("dockershim") in v1.24 (2022). Images built with Docker still run under containerd because both use the same standard image format, defined by the OCI (Open Container Initiative). (general knowledge)
 
 ## Why it matters for a GPU cloud
 

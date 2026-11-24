@@ -27,15 +27,15 @@ A **deployment gate** is a checkpoint a change must pass before it reaches the n
 - **PR gate.** Anything the agent writes arrives as a pull request under branch protection. The agent has no route to push to main. Agentic review passes (bugs, security, compliance with `spec.md`/`plan.md`) run on every PR, but the findings neither approve nor block on their own. A code owner approves. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 - **Approval hooks.** A hook can *ask*: pause the action until a specific person approves. Leadership, change management, and compliance list the human gates that must survive (change sign-off, release authorization, edits to protected paths), and the platform engineer turns each into a hook. Team hooks live in the repo's `.claude/settings.json`; non-negotiable ones live in managed settings that engineers cannot turn off. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 - Example production gate: a script reads the command the agent is about to run; if it contains "deploy" and "production" and no `RELEASE_APPROVAL` is set, it exits with code 2, which blocks the action and tells the agent why. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- Every allow/block decision is logged with a timestamp (to the OpenTelemetry export), so the time spent waiting at each gate is measurable. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- Every allow/block decision is logged with a timestamp (to the OpenTelemetry export: a standard format for sending traces and logs to an observability system), so the time spent waiting at each gate is measurable. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 - Order matters: the PR review gate and approval hooks are prerequisites for CI/CD automation, "because the gates must exist before automation accelerates anything through them". (src: [[2026-11-24-ai-native-sdlc-playbook]])
 
 ### The agent in the pipeline
 
 - Adopt in steps. First, read-only judgment jobs with `claude -p` (non-interactive mode): triage a failed build, judge whether a test failure is flaky, draft the changelog. Then write jobs behind the existing gates: fix lint, update generated docs, address review comments. (src: [[2026-11-24-ai-native-sdlc-playbook]])
 - Agent jobs run sandboxed in containers, under a network policy, with short-lived scoped tokens and no production credentials by default. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- Deploy, status, and rollback are exposed to the agent as tools through MCP, scoped per environment. The agent's deployment powers are then an allowlist, not a shell script holding credentials. (src: [[2026-11-24-ai-native-sdlc-playbook]])
-- Success is measured with the DORA metrics, which CI and deployment tooling already emit. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- Deploy, status, and rollback are exposed to the agent as tools through [[claude-code#Features the playbook uses|MCP]] (Model Context Protocol, a standard way to plug tools into an agent), scoped per environment. The agent's deployment powers are then an allowlist, not a shell script holding credentials. (src: [[2026-11-24-ai-native-sdlc-playbook]])
+- Success is measured with the DORA metrics, which CI and deployment tooling already emit. (src: [[2026-11-24-ai-native-sdlc-playbook]]) DORA (DevOps Research and Assessment) now uses five delivery metrics: change lead time, deployment frequency, failed deployment recovery time, change fail rate, and deployment rework rate. (general knowledge; dora.dev, 2024 change from four to five)
 
 ### Rollback
 

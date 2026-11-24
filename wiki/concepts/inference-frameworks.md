@@ -3,12 +3,12 @@ type: concept
 tags: [provisioning, lifecycle]
 sources: [2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference]
 created: 2026-11-21
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # Inference frameworks (inference servers)
 
-An **inference server** is the program that loads a model onto GPUs, accepts requests, runs the model, and returns the output. An **inference framework** is the broader toolkit (APIs, optimizations, integrations) that such a server is built from. In practice both names refer to the same software. Analogy: a database engine such as PostgreSQL, but for models instead of tables. For a GPU cloud, this is the workload running on each replica, and the control plane deploys, scales, and monitors it. (src: [[2026-11-21-what-is-llm-inference]])
+An **inference server** is the program that loads a model onto GPUs, accepts requests, runs the model, and returns the output. An **inference framework** is the broader toolkit (APIs, optimizations, integrations) that such a server is built from. People use the two names somewhat interchangeably, though the server emphasizes the runtime and the framework the toolkit. (src: [[2026-11-21-what-is-llm-inference]]) Analogy: a database engine such as PostgreSQL, but for models instead of tables. For a GPU cloud, this is the workload running on each replica, and the control plane deploys, scales, and monitors it. (general knowledge)
 
 ## Details
 

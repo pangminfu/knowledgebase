@@ -68,3 +68,16 @@ Append-only. Entry format: `## [YYYY-MM-DD] <ingest|query|lint|schema|init> | <t
 - Created: [[2026-11-23-k8s-running-multiple-instances-of-your-app]], [[kubernetes-scaling]], [[kubernetes-replicaset]]
 - Updated: [[kubernetes-deployment]], [[kubernetes-service]], [[kubernetes-scheduling]], [[kubernetes-labels-and-selectors]], [[kubernetes]], [[kubectl]], [[control-plane]], [[inference-serving]], [[2026-11-22-k8s-using-a-service-to-expose-your-app]] (question cross-link), [[overview]], [[index]]
 - Emphasis (user): desired state and reconcile loop, GPU scaling implications, Service load balancing and endpoints, kubectl commands and status columns
+
+## [2026-11-24] schema | Multi-area knowledge base
+- AGENTS.md Topic: single subject replaced by an Areas table (scope, level, tags per area). GPU cloud stays the primary area with its four domain tags; new areas `software-delivery` and `ai-agents`, both Beginner
+- Tag rule: the Areas table is the complete tag vocabulary; new areas are proposed to the user and logged as schema changes
+- `overview.md` becomes a map of areas followed by per-area synthesis; ingest step 5 and lint checks (knowledge gaps per area, thin areas) reworded to match
+- Existing pages keep their domain tags; no retagging
+
+## [2026-11-24] ingest | The AI-native SDLC playbook (Anthropic)
+- Saved raw: raw/2026-11-24-ai-native-sdlc-playbook.md; images raw/assets/sdlc-bottleneck-shift.png, raw/assets/sdlc-line-vs-loop.png, raw/assets/sdlc-play-dependencies.png, raw/assets/sdlc-claude-tag-incident.png
+- First source in the new `software-delivery` and `ai-agents` areas
+- Created: [[2026-11-24-ai-native-sdlc-playbook]], [[software-development-lifecycle]], [[artifact-chain]], [[agent-guardrails]], [[deployment-gates]], [[control-bands]], [[evals]], [[claude-code]]
+- Updated: [[overview]] (restructured: area map, GPU cloud sections under one heading, new software delivery / AI agents section), [[index]], [[kubernetes-deployment]], [[kubernetes-scaling]], [[control-plane]], [[gpu-utilization-metrics]] (cross-area links)
+- Emphasis (user): all four equally: deployment gates and rollback, control bands, advisory vs enforced controls, artifact chain as audit trail; beginner level

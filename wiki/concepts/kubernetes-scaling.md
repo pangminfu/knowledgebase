@@ -3,7 +3,7 @@ type: concept
 tags: [lifecycle, tenancy-quotas, metering-billing]
 sources: [2026-11-23-k8s-running-multiple-instances-of-your-app]
 created: 2026-11-23
-updated: 2026-11-23
+updated: 2026-11-24
 ---
 
 # Scaling (Kubernetes)
@@ -70,6 +70,7 @@ General knowledge, not from the source.
 - [[inference-serving]]: autoscaling as a serving responsibility; which signal to scale on.
 - [[2026-11-12-sizing-a-gpu-inference-deployment]]: how many GPUs one replica needs, which multiplies into scale-out cost.
 - [[control-plane]]: the reconciliation loop that does the work.
+- [[deployment-gates]]: rollback needs the same free GPUs and cold start as scale-out.
 
 ## Open questions
 

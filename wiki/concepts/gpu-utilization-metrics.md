@@ -3,7 +3,7 @@ type: concept
 tags: [metering-billing]
 sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic]
 created: 2026-11-10
-updated: 2026-11-22
+updated: 2026-11-24
 ---
 
 # GPU utilization metrics
@@ -36,6 +36,7 @@ Numbers meant to say how "busy" a GPU is. They measure very different things. **
 - [[gpu-performance-regimes]]: what the numbers diagnose.
 - [[flops]]: peak vs achieved.
 - [[framework-overhead]]: what time-based util exposes.
+- [[control-bands]]: alerting on a metric's normal range; only as good as the metric chosen.
 
 ## Open questions
 

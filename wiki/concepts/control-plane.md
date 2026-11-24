@@ -3,7 +3,7 @@ type: concept
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing]
 sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-23-k8s-running-multiple-instances-of-your-app]
 created: 2026-11-22
-updated: 2026-11-23
+updated: 2026-11-24
 ---
 
 # Control plane
@@ -46,4 +46,6 @@ flowchart TB
 - [[kubernetes-scheduling]]: one of its core jobs.
 - [[kubernetes-scaling]]: reconciliation driven by a changed replica count.
 - [[inference-serving]]: serving responsibilities, mapped to the four domains.
+- [[software-development-lifecycle]]: the control plane is software too, planned, built, tested, and shipped through an SDLC.
+- [[deployment-gates]]: gated, staged rollouts of control-plane changes.
 - [[overview]]: where each domain stands in this wiki.

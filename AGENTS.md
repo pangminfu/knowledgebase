@@ -6,20 +6,24 @@ The user browses the result in Obsidian (this repo root is the vault).
 
 ## Topic
 
-- **Subject:** GPU cloud control plane engineering.
-- **Goal:** Build a lifelong personal knowledge base: durable, working understanding of
-  how GPU clouds are built and run, starting from these control plane domains and
-  growing beyond them as interests expand:
-  1. Provisioning APIs
-  2. Tenancy and quotas
-  3. Kubernetes and bare-metal lifecycle
-  4. Metering and billing
-- **Current level:** Beginner. Define every term on first use, use analogies, and
-  link jargon to its concept page. Don't assume prior cloud or infra background.
+- **Purpose:** A lifelong personal knowledge base: durable, working understanding of
+  every subject the user studies, growing as interests expand. Not limited to one topic.
+- **Areas:** each area has a scope, a current level, and the tags its pages use.
+
+  | Area | Scope | Level | Tags |
+  | --- | --- | --- | --- |
+  | GPU cloud (primary) | How GPU clouds are built and run, starting from four control plane domains: provisioning APIs; tenancy and quotas; Kubernetes and bare-metal lifecycle; metering and billing | Beginner | `provisioning`, `tenancy-quotas`, `lifecycle`, `metering-billing` |
+  | Software delivery | How software is planned, designed, built, tested, shipped, and maintained (the SDLC) | Beginner | `software-delivery` |
+  | AI agents | How AI coding agents work and how they are steered and controlled | Beginner | `ai-agents` |
+
+- **Beginner level** means: define every term on first use, use analogies, and link
+  jargon to its concept page. Don't assume prior cloud, infra, or software-process background.
 - **Ingest style:** Supervised. Always discuss takeaways before writing pages.
 
-Tag pages with the domain(s) they serve: `provisioning`, `tenancy-quotas`,
-`lifecycle`, `metering-billing`.
+Tag every page with at least one tag from the Areas table; a page may carry tags from
+several areas. The table is the complete tag vocabulary: when a source fits no
+existing area, propose a new area (name, scope, level, tag) to the user, and on
+approval add a row here and log it as a schema change.
 
 If any field above is `(not set)`, ask the user for it at the start of the session
 and fill it in here before doing anything else.
@@ -32,7 +36,7 @@ raw/assets/          Images/attachments belonging to sources.
 wiki/                Owned entirely by you.
 wiki/index.md        Catalog of every wiki page, by category, one line each.
 wiki/log.md          Append-only chronological record of operations.
-wiki/overview.md     The current big-picture synthesis of the topic.
+wiki/overview.md     Map of all areas, then the big-picture synthesis of each area.
 wiki/sources/        One summary page per ingested source.
 wiki/concepts/       Ideas, techniques, definitions, principles.
 wiki/entities/       Concrete things: people, tools, libraries, papers, organizations.
@@ -111,7 +115,7 @@ wiki/syntheses/      Filed answers to queries: comparisons, analyses, explanatio
    unless the user asked for unsupervised/batch ingest.
 3. Write the source page in `wiki/sources/`.
 4. Create or update every relevant concept and entity page; add cross-links both ways.
-5. Update `wiki/overview.md` if the big picture changed.
+5. Update `wiki/overview.md` if the big picture of an area changed, or the area map did.
 6. Add new pages to `wiki/index.md`; refresh one-line summaries of pages that changed.
 7. Append to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <title>` plus a bullet list of
    pages created/updated.
@@ -138,7 +142,8 @@ Check and report, then fix what is mechanical (ask before substantive rewrites):
 - concepts/entities mentioned in several pages but lacking their own page
 - pages missing from `index.md`, or index entries pointing to missing pages
 - missing or malformed frontmatter
-- knowledge gaps: suggest next sources to find and questions to investigate
+- knowledge gaps per area: suggest next sources to find and questions to investigate
+- thin areas: areas with a single source, or whose pages link to no other area
 
 Log `## [YYYY-MM-DD] lint | <summary>`.
 

@@ -3,7 +3,7 @@ type: concept
 tags: [lifecycle, provisioning]
 sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app]
 created: 2026-11-22
-updated: 2026-11-23
+updated: 2026-11-24
 ---
 
 # Deployment (Kubernetes)
@@ -41,6 +41,7 @@ General knowledge.
 - [[kubernetes-labels-and-selectors]]: how a Deployment and a Service find its Pods.
 - [[control-plane]]: runs the controller that keeps the replica count.
 - [[training-vs-inference]]: service (Deployment) vs batch job (Job).
+- [[deployment-gates]]: who may trigger a rollout or rollback, and rehearsing rollback.
 
 ## Open questions
 

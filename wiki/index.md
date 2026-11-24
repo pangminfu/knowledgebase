@@ -4,7 +4,7 @@ Catalog of every page in the wiki. One line per page: link — summary.
 
 ## Overview
 
-- [[overview]] — big picture: GPU physics, the four-step inference sizing chain, the serving layer the control plane owns, Kubernetes objects and replica scaling; domain coverage table; next sources
+- [[overview]] — map of areas (GPU cloud; software delivery; AI agents), then per-area synthesis: GPU physics, inference sizing chain, serving layer, Kubernetes objects and scaling; the SDLC bottleneck shift, artifact chain, agent guardrails, deployment gates; coverage and next sources per area
 
 ## Sources
 
@@ -15,6 +15,7 @@ Catalog of every page in the wiki. One line per page: link — summary.
 - [[2026-11-22-k8s-viewing-pods-and-nodes]] — Kubernetes Basics Module 3: Pods (shared IP/volumes, atomic unit), Nodes (VM or physical; kubelet + containerd), scheduling by free resources, kubectl get/describe/logs/exec/proxy
 - [[2026-11-22-k8s-using-a-service-to-expose-your-app]] — Kubernetes Basics Module 4: Services as a stable address for mortal Pods; ClusterIP/NodePort/LoadBalancer/ExternalName; labels and selectors; expose/label/delete with kubectl
 - [[2026-11-23-k8s-running-multiple-instances-of-your-app]] — Kubernetes Basics Module 5: scaling = changing a Deployment's replica count; ReplicaSet DESIRED vs CURRENT; scale-to-zero; Service spreads traffic via endpoints; kubectl scale
+- [[2026-11-24-ai-native-sdlc-playbook]] — Anthropic (2026): AI-native SDLC playbook; six stages as a loop, committed artifacts (intent → spec → plan → PR), advisory vs enforced agent controls, production gate, σ-band monitoring that writes the next intent
 
 ## Concepts
 
@@ -47,6 +48,12 @@ Catalog of every page in the wiki. One line per page: link — summary.
 - [[kubernetes-scaling]] — changing replica count by hand or autoscaler; desired-state loop; endpoints follow; GPU pitfalls: Pending, cold start, scaling signal, scale-to-zero pricing, drain on scale-down, quotas
 - [[kubernetes-scheduling]] — placing Pods on Nodes by resource requests; GPUs as whole extended resources; Pending on scale-out, fragmentation, gang scheduling, quotas in front
 - [[container]] — packaged app as an isolated process; image vs container vs registry; Docker vs containerd; GPU images and cold start
+- [[software-development-lifecycle]] — the SDLC: plan, design, build, test, deploy, maintain; traditional roles vs AI-native loop; beginner glossary (git, PR, CI/CD, environments, rollback)
+- [[artifact-chain]] — each stage commits a file the next stage reads; triggers, approvers, git-timestamp metrics, coexisting with Jira/ServiceNow as source of truth
+- [[agent-guardrails]] — advisory (CLAUDE.md, skills) vs deterministic (hooks, permissions, sandbox, branch protection) controls; separation of duties; managed settings key by key
+- [[deployment-gates]] — agent acts up to the production gate; autonomy tiered by environment; approval hooks; agent in CI/CD via MCP; rehearsed rollback; Kubernetes rollback on GPUs
+- [[control-bands]] — rolling mean ± σ, Western Electric rules; 1σ log / 2σ diagnose / 3σ propose; deterministic detection, breach → intent.md → eval; inference-platform metrics
+- [[evals]] — tests for an AI agent's behaviour; 20–50 real tasks re-run on config changes; incident → eval; vs feedback loop and verifier subagent
 
 ## Entities
 
@@ -56,6 +63,7 @@ Catalog of every page in the wiki. One line per page: link — summary.
 - [[kubelet]] — per-Node agent that runs Pods for the control plane; heartbeats, probes, GPU device-plugin registration
 - [[containerd]] — the container runtime that pulls and runs images on each Node; replaced Docker in Kubernetes; GPU access via NVIDIA toolkit
 - [[kubectl]] — Kubernetes CLI cheat sheet: get/describe/logs/exec/proxy, expose/label/-l selectors, scale/get rs from the tutorials, plus GPU-node triage commands
+- [[claude-code]] — Anthropic's coding agent: plan/auto mode, CLAUDE.md, skills, hooks, subagents, worktrees, `claude -p`, MCP, managed settings; related products (Security, Tag, Design)
 
 ## Syntheses
 

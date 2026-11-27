@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [lifecycle]
-sources: [2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app]
+sources: [2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app, 2026-11-27-k8s-performing-a-rolling-update]
 created: 2026-11-23
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 # ReplicaSet (Kubernetes)
@@ -33,13 +33,14 @@ flowchart LR
   RS2 --> P4["Pod"]
 ```
 
-- One ReplicaSet exists per Pod-template version. A rolling update scales the new ReplicaSet up and the old one down step by step. Old ReplicaSets are kept at 0 replicas (10 by default) so `kubectl rollout undo` can switch back.
+- One ReplicaSet exists per Pod-template version. A [[kubernetes-rolling-update|rolling update]] scales the new ReplicaSet up and the old one down step by step. Old ReplicaSets are kept at 0 replicas (10 by default) so `kubectl rollout undo` can switch back. The tutorial shows the visible half of this: `set image` starts the update, new Pods appear while old ones terminate, and `rollout undo` returns to the previous version (src: [[2026-11-27-k8s-performing-a-rolling-update]]).
 - The Deployment owns rollout strategy and history. The ReplicaSet only knows "N copies of this template". That is why you scale and update the Deployment, never its ReplicaSet: the Deployment would overwrite a manual change to the ReplicaSet.
 
 ## Related
 
 - [[kubernetes-deployment]]: creates and owns ReplicaSets; the object you actually edit.
 - [[kubernetes-scaling]]: changes the desired count a ReplicaSet enforces.
+- [[kubernetes-rolling-update]]: moves Pods from the old template's ReplicaSet to the new one.
 - [[kubernetes-pod]]: what a ReplicaSet creates and replaces.
 - [[kubernetes-labels-and-selectors]]: how a ReplicaSet identifies its Pods.
 - [[control-plane]]: its controller is one of the reconciliation loops in the controller manager.

@@ -1,9 +1,9 @@
 ---
 type: entity
 tags: [lifecycle]
-sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app]
+sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app, 2026-11-27-k8s-performing-a-rolling-update]
 created: 2026-11-22
-updated: 2026-11-23
+updated: 2026-11-27
 ---
 
 # kubectl (cheat sheet)
@@ -89,7 +89,30 @@ kubectl scale deployments/kubernetes-bootcamp --replicas=2   # scale down; 2 Pod
 ```
 
 - `--replicas=N` also works when creating: `kubectl create deployment <name> --image=<image> --replicas=N`. (`--replicas` on create: src; full command form: general knowledge)
-- `kubectl scale` only sets the desired count; the [[kubernetes-replicaset|ReplicaSet]] does the work. Watch it converge with `kubectl get rs` or `kubectl rollout status deployment/<name>`. (first part: src; `rollout status`: general knowledge) See [[kubernetes-scaling]].
+- `kubectl scale` only sets the desired count; the [[kubernetes-replicaset|ReplicaSet]] does the work. Watch it converge with `kubectl get rs` or `kubectl rollout status deployment/<name>`. (first part: src; `rollout status` on a scale: general knowledge) See [[kubernetes-scaling]].
+
+### Rolling updates and rollback (Module 6)
+
+All from the source (src: [[2026-11-27-k8s-performing-a-rolling-update]]):
+
+```shell
+kubectl describe pods                                  # Image field = current version
+kubectl set image deployments/kubernetes-bootcamp kubernetes-bootcamp=docker.io/jocatalin/kubernetes-bootcamp:v2   # start a rolling update
+kubectl get pods                                       # new Pods starting, old ones terminating
+kubectl rollout status deployments/kubernetes-bootcamp # progress / completion of the rollout
+
+kubectl set image deployments/kubernetes-bootcamp kubernetes-bootcamp=gcr.io/google-samples/kubernetes-bootcamp:v10  # bad tag
+kubectl get deployments                                # fewer AVAILABLE than desired
+kubectl get pods                                       # some Pods in ImagePullBackOff
+kubectl describe pods --show-events=true               # Events: image not found in the repository
+kubectl rollout undo deployments/kubernetes-bootcamp   # back to the previous revision (v2)
+
+kubectl delete deployments/kubernetes-bootcamp services/kubernetes-bootcamp   # clean up
+```
+
+- `set image` arguments: `<container-name>=<registry>/<repository>:<tag>`. The name before `=` is the container inside the Pod template. (general knowledge)
+- Related `rollout` subcommands (general knowledge; verified: [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#checking-rollout-history-of-a-deployment)): `rollout history deployment/<name>` lists revisions; `rollout undo ... --to-revision=N` reverts to a specific one; `rollout pause` / `rollout resume` batch several template edits into one rollout; `rollout restart` replaces all Pods without a template change.
+- `delete` accepts several `type/name` arguments in one call. See [[kubernetes-rolling-update]] for what these commands set in motion.
 
 ### Usage notes
 
@@ -116,5 +139,6 @@ General knowledge, not from the source; useful on GPU clusters.
 - [[kubernetes]]: the system it controls.
 - [[kubernetes-pod]], [[kubernetes-node]], [[kubernetes-deployment]], [[kubernetes-replicaset]], [[kubernetes-service]]: the objects these commands act on.
 - [[kubernetes-scaling]]: what `kubectl scale` sets in motion.
+- [[kubernetes-rolling-update]]: what `set image` and `rollout` set in motion.
 - [[control-plane]]: the API server kubectl talks to.
 - [[nvidia-smi]]: the GPU-side counterpart for triage.

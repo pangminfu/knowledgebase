@@ -6,7 +6,7 @@ raw: raw/2026-11-23-k8s-running-multiple-instances-of-your-app.md
 url: https://kubernetes.io/docs/tutorials/kubernetes-basics/scale/scale-intro/
 author: Kubernetes documentation (kubernetes.io)
 created: 2026-11-23
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 # Running Multiple Instances of Your App (Kubernetes Basics, Module 5)
@@ -77,4 +77,4 @@ After scaling to 4: the Pods are spread over all three Nodes (10.0.0.5; 10.0.2.4
 - When scaling down, which Pods does the ReplicaSet pick to terminate, and how do in-flight requests (e.g. long streamed LLM responses) finish cleanly?
 - What happens to a scale-up blocked by a tenant's ResourceQuota, compared with one blocked by a lack of free GPUs?
 - How does a GPU cloud add Nodes when replicas are Pending (cluster autoscaler, bare-metal provisioning), and how long does that take?
-- Next tutorial module: "Performing a Rolling Update".
+- Next tutorial module: "Performing a Rolling Update", ingested as [[2026-11-27-k8s-performing-a-rolling-update]].

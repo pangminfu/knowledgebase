@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [software-delivery, ai-agents, lifecycle]
-sources: [2026-11-24-ai-native-sdlc-playbook]
+sources: [2026-11-24-ai-native-sdlc-playbook, 2026-11-27-k8s-performing-a-rolling-update]
 created: 2026-11-24
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 # Deployment gates and tiered autonomy
@@ -47,7 +47,8 @@ A **deployment gate** is a checkpoint a change must pass before it reaches the n
 
 General knowledge.
 
-- In Kubernetes, a release is usually a rolling update of a [[kubernetes-deployment|Deployment]], and `kubectl rollout undo` rolls the Deployment back to its previous revision (old ReplicaSets are kept as revision history). It only reverts the Pod template, not separately changed ConfigMaps or Secrets. It is quick to run but still needs rehearsing: on GPU services the old version's Pods must find free GPUs and reload model weights (cold start), so a rollback can take minutes and needs spare capacity ([[kubernetes-scaling]]). (verified: [Kubernetes: Deployments, rolling back](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#rolling-back-a-deployment))
+- In Kubernetes, a release is usually a [[kubernetes-rolling-update|rolling update]] of a [[kubernetes-deployment|Deployment]], and `kubectl rollout undo` reverts the Deployment to its previous known state. (src: [[2026-11-27-k8s-performing-a-rolling-update]]) Old ReplicaSets are kept as revision history. Rollback reverts only the Pod template, not separately changed ConfigMaps or Secrets. It is quick to run but still needs rehearsing: on GPU services the old version's Pods must find free GPUs and reload model weights (cold start), so a rollback can take minutes and needs spare capacity ([[kubernetes-scaling]]). (verified: [Kubernetes: Deployments, rolling back](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#rolling-back-a-deployment))
+- Kubernetes does not roll back a failed rollout by itself. A stalled rollout only gets the condition `ProgressDeadlineExceeded`, after 600 s by default. The pipeline or a person has to detect that and run the rollback, which is where this page's rehearsed rollback and the [[control-bands|control-band]] trigger plug in. (verified: [Deployments, failed Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#failed-deployment))
 - Control-plane rollouts across a GPU fleet usually go in waves (one cluster or region first) with gates between waves, the same "act up to the gate" pattern at a larger scale.
 
 ## Related
@@ -56,6 +57,7 @@ General knowledge.
 - [[control-bands]]: the monitoring that triggers rollback and new work.
 - [[artifact-chain]]: the PR as the audit record at the gate.
 - [[kubernetes-deployment]]: rolling updates and rollback in Kubernetes.
+- [[kubernetes-rolling-update]]: rollout mechanics, stalled rollouts, and rollback on GPUs.
 - [[software-development-lifecycle]]: the deploy stage in context.
 
 ## Contradictions

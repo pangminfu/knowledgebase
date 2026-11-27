@@ -1,9 +1,9 @@
 ---
 type: entity
 tags: [lifecycle, provisioning, tenancy-quotas]
-sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app]
+sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app, 2026-11-27-k8s-performing-a-rolling-update]
 created: 2026-11-22
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 # Kubernetes
@@ -24,7 +24,7 @@ updated: 2026-11-24
 
 General knowledge.
 
-- **Lifecycle:** Node health, draining, and replacement; Pod restarts; rolling upgrades of inference replicas.
+- **Lifecycle:** Node health, draining, and replacement; Pod restarts; [[kubernetes-rolling-update|rolling upgrades]] of inference replicas.
 - **Provisioning:** a cloud "create endpoint" or "create cluster" API ends up creating Kubernetes objects, e.g. a Deployment plus a Service for an inference endpoint.
 - **Tenancy and quotas:** namespaces, ResourceQuota, and dedicated Node pools are the Kubernetes-level isolation tools; labels tag objects by tenant.
 - **Metering:** Pod start/stop times and GPU requests are the raw data behind GPU-hour billing, attributed to tenants by namespace and label.
@@ -36,4 +36,5 @@ General knowledge.
 - [[kubectl]]: how you talk to it.
 - [[kubernetes-service]], [[kubernetes-labels-and-selectors]]: how workloads are addressed and grouped.
 - [[kubernetes-scaling]], [[kubernetes-replicaset]]: how the number of Pods is set and enforced.
-- [[2026-11-22-k8s-viewing-pods-and-nodes]], [[2026-11-22-k8s-using-a-service-to-expose-your-app]], [[2026-11-23-k8s-running-multiple-instances-of-your-app]]: the tutorial modules this page is based on.
+- [[kubernetes-rolling-update]]: how a new version replaces the running Pods.
+- [[2026-11-22-k8s-viewing-pods-and-nodes]], [[2026-11-22-k8s-using-a-service-to-expose-your-app]], [[2026-11-23-k8s-running-multiple-instances-of-your-app]], [[2026-11-27-k8s-performing-a-rolling-update]]: the tutorial modules this page is based on.

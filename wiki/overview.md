@@ -1,9 +1,9 @@
 ---
 type: overview
 tags: [provisioning, tenancy-quotas, lifecycle, metering-billing, software-delivery, ai-agents]
-sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference, 2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app, 2026-11-24-ai-native-sdlc-playbook]
+sources: [2026-11-10-deep-learning-brrrr-first-principles, 2026-11-12-transformer-inference-arithmetic, 2026-11-21-what-is-llm-inference, 2026-11-22-training-vs-inference, 2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app, 2026-11-24-ai-native-sdlc-playbook, 2026-11-27-k8s-performing-a-rolling-update]
 created: 2026-11-10
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 # Overview
@@ -12,11 +12,11 @@ A lifelong knowledge base, organized into areas. Each area below has its own big
 
 | Area | Scope | Sources | Entry points |
 | --- | --- | --- | --- |
-| [[#GPU cloud]] (primary) | How GPU clouds are built and run: provisioning APIs, tenancy and quotas, Kubernetes/bare-metal lifecycle, metering and billing | 7 | [[control-plane]], [[inference-serving]], [[kubernetes]] |
-| Software delivery ([[#Software delivery and AI agents]]) | How software is planned, built, tested, shipped, maintained | 1 | [[software-development-lifecycle]], [[deployment-gates]] |
+| [[#GPU cloud]] (primary) | How GPU clouds are built and run: provisioning APIs, tenancy and quotas, Kubernetes/bare-metal lifecycle, metering and billing | 8 | [[control-plane]], [[inference-serving]], [[kubernetes]] |
+| Software delivery ([[#Software delivery and AI agents]]) | How software is planned, built, tested, shipped, maintained | 2 (one shared with GPU cloud) | [[software-development-lifecycle]], [[deployment-gates]] |
 | AI agents ([[#Software delivery and AI agents]]) | How coding agents work and are controlled | 1 (shared with software delivery) | [[agent-guardrails]], [[claude-code]] |
 
-Where areas meet (general knowledge): a GPU cloud's control plane is software shipped through an SDLC; rollbacks and gated rollouts land on Kubernetes Deployments ([[deployment-gates]], [[kubernetes-deployment]]); alerting on control bands depends on choosing metrics that mean what you think ([[control-bands]], [[gpu-utilization-metrics]]).
+Where areas meet (general knowledge): a GPU cloud's control plane is software shipped through an SDLC; rollbacks and gated rollouts land on Kubernetes Deployments as [[kubernetes-rolling-update|rolling updates]], which stall rather than roll back on their own, so the pipeline's gate and rollback must act ([[deployment-gates]], [[kubernetes-deployment]]); alerting on control bands depends on choosing metrics that mean what you think ([[control-bands]], [[gpu-utilization-metrics]]).
 
 ## GPU cloud
 
@@ -107,13 +107,23 @@ Control-plane consequences (general knowledge):
 - **Scale-to-zero is a pricing decision.** It saves idle GPU-hours at the cost of a cold start. Someone pays for minimum replicas: the customer on a dedicated endpoint, the provider on a serverless API ([[per-token-pricing]]).
 - **Scale-down must drain.** Long streamed responses need a longer termination grace period than the 30 s default, or they are cut off mid-stream.
 
+### Shipping new versions: rolling updates
+
+A [[kubernetes-rolling-update|rolling update]] changes a Deployment's Pod template, usually its image (`kubectl set image`). Kubernetes then replaces Pods a few at a time, and new Pods go to Nodes with free resources. Two limits set the pace: how many Pods may be unavailable and how many extra Pods may be created, as counts or percentages. The Service routes only to Pods that can serve, so clients see one unchanged address throughout. Updates are versioned. A bad image (`ImagePullBackOff`) stalls the rollout, and `kubectl rollout undo` returns to the last good version. (src: [[2026-11-27-k8s-performing-a-rolling-update]]) The tutorial gives the default limits as one each; the reference gives 25% each (see [[kubernetes-rolling-update#Contradictions]]).
+
+Control-plane consequences (general knowledge):
+
+- **Surge costs GPUs.** At the default 25% surge, ten 8-GPU replicas need 24 spare GPUs mid-rollout. Without them, the surge Pods sit Pending and the rollout stalls. The alternative, `maxSurge: 0`, runs below capacity instead. Either way, quotas and capacity plans must include rollout headroom.
+- **Stalls are reported, not fixed.** After `progressDeadlineSeconds` (600 s), Kubernetes only sets `ProgressDeadlineExceeded`. Automatic rollback is the platform's job, and the deadline must allow for model-load cold starts ([[deployment-gates]]).
+- **Upgrades overlap versions and GPU-hours.** Old and new models serve side by side until the rollout completes. Surge and terminating Pods both hold GPUs, so metering must decide who pays for the overlap.
+
 ### Coverage so far
 
 | Domain | Status |
 | --- | --- |
 | Provisioning APIs | GPU/SKU background, inference sizing rules, the serving responsibilities an endpoint API must cover, and training-cluster vs endpoint provisioning shapes (unsourced mapping); no actual API sources yet |
 | Tenancy and quotas | Concurrency-as-memory from inference arithmetic; serving-side queuing/rate limits and training capacity blocks identified but unsourced |
-| Kubernetes and bare-metal lifecycle | Kubernetes basics sourced (Pods, Nodes, kubelet, runtime, scheduling by free resources, replacement on Node failure, Services and Service types, labels/selectors, manual scaling via Deployment/ReplicaSet, endpoints, kubectl triage); autoscaling (HPA/cluster autoscaler), rolling updates, GPU device plugins, gang scheduling, Node health/drain, readiness probes, graceful termination, and bare-metal provisioning still unsourced |
+| Kubernetes and bare-metal lifecycle | Kubernetes basics sourced (Pods, Nodes, kubelet, runtime, scheduling by free resources, replacement on Node failure, Services and Service types, labels/selectors, manual scaling via Deployment/ReplicaSet, endpoints, rolling updates and rollback, kubectl triage); autoscaling (HPA/cluster autoscaler), GPU device plugins, gang scheduling, Node health/drain, readiness probes, graceful termination, and bare-metal provisioning still unsourced (rollout strategy details verified online but not ingested) |
 | Metering and billing | Utilization metrics, tokens-vs-GPU-hours reasoning, per-token vs GPU-hour products, inference as the recurring cost; no billing-pipeline sources |
 
 ### Suggested next sources
@@ -121,7 +131,7 @@ Control-plane consequences (general knowledge):
 - A provider's GPU instance docs and pricing page (e.g. AWS EC2 P-series, GCP A3, CoreWeave): provisioning, billing granularity, and how they present concurrency.
 - Modular LLM Inference Handbook follow-on chapters: continuous batching, prefix caching, quantization, routing, serverless vs self-hosted (ordered list in [[inference-optimization]]).
 - vLLM / TensorRT LLM documentation on continuous batching (per-step scheduling) and PagedAttention (KV-cache memory management): the engine half of serving, from the engine authors.
-- Kubernetes Basics Module 2 (Deployments) and Module 6 (rolling updates); Kubernetes autoscaling docs (HPA, cluster autoscaler) and an LLM autoscaler (KServe or KEDA); Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling (built-in Gang Scheduling / PodGroup API, Kueue, Volcano): lifecycle.
+- Kubernetes Basics Module 2 (Deployments) and the Deployments concept doc (rollout status, pausing, proportional scaling); Kubernetes autoscaling docs (HPA, cluster autoscaler) and an LLM autoscaler (KServe or KEDA); Kubernetes docs on device plugins, the NVIDIA GPU Operator, and gang scheduling (built-in Gang Scheduling / PodGroup API, Kueue, Volcano): lifecycle.
 - Gateway API Inference Extension / llm-d / KServe docs: how inference platforms route requests above a plain Service.
 - Kubernetes ResourceQuota and cloud quota docs: tenancy and quotas.
 - NVIDIA DCGM docs: real utilization metrics for metering.

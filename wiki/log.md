@@ -108,3 +108,11 @@ Append-only. Entry format: `## [YYYY-MM-DD] <ingest|query|lint|schema|init> | <t
 - SDLC/agents: hook `ask` prompts the session user and is denied in `-p` runs (playbook claim kept, Contradictions); managed-settings keys corrected and two playbook example gaps noted; six permission modes and settings precedence; DORA history; exact Western Electric rules; playbook misquotes fixed ([[agent-guardrails]], [[deployment-gates]], [[claude-code]], [[evals]], [[control-bands]], [[artifact-chain]], [[software-development-lifecycle]], [[2026-11-24-ai-native-sdlc-playbook]])
 - Mechanical: all wikilinks and heading links resolve; index complete with refreshed summaries; frontmatter valid
 - Open: verified general-knowledge claims could become sourced by ingesting the Kubernetes Nodes / Device Plugins / Gang Scheduling docs, the Modular fine-tuning chapter, and provider pricing pages; Claude Security's "Mythos 5 rates" billing claim unverifiable
+
+## [2026-11-27] ingest | Performing a Rolling Update (Kubernetes Basics, Module 6)
+- Raw: saved [[raw/2026-11-27-k8s-performing-a-rolling-update]] with 4 diagrams in `raw/assets/k8s-rollingupdates-{1..4}.svg`
+- Emphasis (user): mechanics, failure and rollback, GPU-cloud bridge
+- Created: [[2026-11-27-k8s-performing-a-rolling-update]], [[kubernetes-rolling-update]]
+- Updated: [[kubernetes-deployment]], [[kubernetes-replicaset]], [[kubernetes-service]], [[kubernetes-scaling]], [[deployment-gates]], [[container]], [[kubectl]], [[kubernetes]], [[2026-11-23-k8s-running-multiple-instances-of-your-app]], [[overview]] (new "Shipping new versions" section, coverage, next sources), [[index]]
+- Contradictions recorded in [[kubernetes-rolling-update]]: tutorial's default pace limits "one and one" vs reference 25%/25% (agree only at 4 replicas); "waits for new Pods before removing old" vs maxUnavailable allowing immediate scale-down; multiple replicas "a requirement"
+- Verified online: maxSurge/maxUnavailable rounding, progressDeadlineSeconds 600 with no automatic rollback, revisionHistoryLimit, Recreate strategy, ImagePullBackOff 300 s back-off cap

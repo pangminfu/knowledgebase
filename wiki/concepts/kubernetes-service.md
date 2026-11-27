@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [provisioning, lifecycle]
-sources: [2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app]
+sources: [2026-11-22-k8s-using-a-service-to-expose-your-app, 2026-11-23-k8s-running-multiple-instances-of-your-app, 2026-11-27-k8s-performing-a-rolling-update]
 created: 2026-11-22
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 # Service (Kubernetes)
@@ -53,6 +53,7 @@ Each type builds on the one below it, so a LoadBalancer Service also has a NodeP
 - **Discovery:** cluster DNS gives each Service an A/AAAA record `<service>.<namespace>.svc.<cluster-domain>`, e.g. `my-svc.my-namespace.svc.cluster.local` (`cluster.local` is the usual default domain). Pods in the same namespace can use just `my-svc`. (general knowledge; verified: [DNS for Services and Pods](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/); the source only says Services provide "service discovery")
 - **How traffic is forwarded:** kube-proxy, a component on each Node, installs packet-rewriting rules that send traffic for the cluster IP to one of the backend Pod IPs. Linux modes: `iptables` (default), `nftables` (GA since v1.33), and `ipvs` (deprecated since v1.35, removal planned for v1.40). `iptables` and `nftables` pick a backend at random; `ipvs` defaults to round-robin. Balancing happens per connection (layer 4: the TCP connection level), not per HTTP request: every request on one open connection goes to the same Pod. (general knowledge; verified: [Virtual IPs and Service Proxies](https://kubernetes.io/docs/reference/networking/virtual-ips/), [Scheduling the removal of the kube-proxy IPVS backend](https://kubernetes.io/blog/2026/11/16/ipvs-removal/))
 - **Readiness:** a readiness probe is a periodic check the [[kubelet]] runs against a container (an HTTP call, TCP connect, gRPC call, or command) to ask "can you take traffic yet?". A Pod that fails it is marked not-ready in the EndpointSlice and kube-proxy sends it no traffic, so a Pod that is starting up gets no requests. (general knowledge; verified: [Liveness, Readiness, and Startup Probes](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/))
+- **During a rolling update**, the Service sends traffic only to Pods that can handle requests, which keeps the app reachable while Pods are replaced. Every replaced Pod gets a new IP, while the Service IP stays the same. (src: [[2026-11-27-k8s-performing-a-rolling-update]]) What "can handle requests" means in practice is the readiness check above. (general knowledge) See [[kubernetes-rolling-update]].
 
 ### Lifecycle is separate from the workload
 
@@ -76,6 +77,7 @@ All general knowledge; not from the source.
 - [[kubernetes-pod]]: the backends; why their IPs cannot be relied on.
 - [[kubernetes-deployment]]: keeps the backends running; separate object from the Service.
 - [[kubernetes-scaling]]: changes how many backends exist; endpoints follow automatically.
+- [[kubernetes-rolling-update]]: replaces every backend, one step at a time, behind the same address.
 - [[kubernetes-node]]: where NodePort ports open.
 - [[inference-serving]]: load balancing across replicas, one of the serving responsibilities.
 - [[kubectl]]: `expose`, `get services`, `describe services`, `delete service`.

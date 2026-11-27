@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [lifecycle, provisioning]
-sources: [2026-11-22-k8s-viewing-pods-and-nodes]
+sources: [2026-11-22-k8s-viewing-pods-and-nodes, 2026-11-27-k8s-performing-a-rolling-update]
 created: 2026-11-22
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 # Container
@@ -18,6 +18,8 @@ A **container** is an application packaged with everything it needs to run (code
 - The tutorial's example app is a Node.js server (`server.js`) in a container listening on port 8080. `kubectl exec` runs commands inside it ([[kubectl]]). (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
 - Containers vs virtual machines: a VM emulates a whole computer with its own operating system; containers on one machine share the host's OS kernel. That makes them lighter and faster to start, with weaker isolation than a VM. (general knowledge)
 - **Docker** popularized containers and the image format, and "Docker image" is still a common name for a container image. Kubernetes removed its built-in Docker Engine support (dockershim) in v1.24; Nodes now use a CRI runtime such as containerd or CRI-O (Docker Engine still works only through the separate `cri-dockerd` adapter). Images built with Docker run unchanged, because they follow the OCI (Open Container Initiative) image format. (general knowledge; verified: [Dockershim removal FAQ](https://kubernetes.io/blog/2022/02/17/dockershim-faq/)) The source shows this shift half-done: its Pod section still says "containers (such as Docker)", while its Node section names containerd as the runtime. (src: [[2026-11-22-k8s-viewing-pods-and-nodes]])
+- **Image references and tags.** An image is named `registry/repository:tag`, e.g. `docker.io/jocatalin/kubernetes-bootcamp:v2`, and the tag picks the version. A [[kubernetes-rolling-update|rolling update]] is started by pointing a Deployment at a new tag. A tag that doesn't exist (`v10`) leaves new Pods in **`ImagePullBackOff`**, and `kubectl describe pods --show-events=true` shows that the image wasn't found. (src: [[2026-11-27-k8s-performing-a-rolling-update]]; naming breakdown: general knowledge) The [[kubelet]] keeps retrying the pull, waiting longer each time up to a 300 s cap. Bad names, bad tags, and missing private-registry credentials all fail this way. (general knowledge; verified: [Images, ImagePullBackOff](https://kubernetes.io/docs/concepts/containers/images/#imagepullbackoff))
+- Tags are mutable labels: the same tag can be moved to a new image. Production deployments often pin the immutable content digest (`image@sha256:...`) instead, so that a rollback really returns to the same bytes. (general knowledge)
 
 ## GPU cloud bridge
 
@@ -34,3 +36,4 @@ General knowledge.
 - [[kubelet]]: tells the runtime which containers to run.
 - [[kubectl]]: `logs` and `exec` act on containers.
 - [[inference-frameworks]]: what the container runs in an inference replica.
+- [[kubernetes-rolling-update]]: changing a Deployment's image tag is what starts a rollout.

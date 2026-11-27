@@ -1,9 +1,9 @@
 ---
 type: concept
 tags: [lifecycle, tenancy-quotas, metering-billing]
-sources: [2026-11-23-k8s-running-multiple-instances-of-your-app]
+sources: [2026-11-23-k8s-running-multiple-instances-of-your-app, 2026-11-27-k8s-performing-a-rolling-update]
 created: 2026-11-23
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 # Scaling (Kubernetes)
@@ -37,7 +37,8 @@ The same loop replaces Pods lost to a Node failure. A lost Pod and a scale-up bo
 ### Traffic follows automatically
 
 - A [[kubernetes-service|Service]] load-balances across all Pods of an exposed Deployment. It continuously monitors running Pods through **endpoints**, so new replicas receive traffic and terminated ones stop receiving it. The Service itself does not change. (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]])
-- Multiple replicas make rolling updates without downtime easier: the tutorial says that with several instances "you would be able to do Rolling updates without downtime". (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]]) A single replica can also update without downtime under the default surge setting, but has no spare capacity during the swap. (general knowledge)
+- Multiple replicas make [[kubernetes-rolling-update|rolling updates]] without downtime easier: Module 5 says that with several instances "you would be able to do Rolling updates without downtime", and Module 6 calls it "a requirement". (src: [[2026-11-23-k8s-running-multiple-instances-of-your-app]], [[2026-11-27-k8s-performing-a-rolling-update]]) A single replica can also update without downtime under the default surge setting, but has no spare capacity during the swap. (general knowledge)
+- Scaling and updating are different edits to a Deployment. Scaling changes the replica count and creates no new revision. Updating changes the Pod template, which creates a new ReplicaSet and a new revision that can be rolled back. (general knowledge; verified: [Deployments, rolling back](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#rolling-back-a-deployment))
 
 ### Manual vs automatic
 
@@ -71,6 +72,7 @@ General knowledge, not from the source.
 - [[2026-11-12-sizing-a-gpu-inference-deployment]]: how many GPUs one replica needs, which multiplies into scale-out cost.
 - [[control-plane]]: the reconciliation loop that does the work.
 - [[deployment-gates]]: rollback needs the same free GPUs and cold start as scale-out.
+- [[kubernetes-rolling-update]]: surge Pods need the same free GPUs and quota headroom as scale-out.
 
 ## Open questions
 
